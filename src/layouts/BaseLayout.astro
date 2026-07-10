@@ -8,6 +8,8 @@ import "@fontsource/inter/600.css";
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import Analytics from "@vercel/analytics/astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
 
 interface Props {
 	title?: string;
@@ -42,5 +44,7 @@ const {
 			<slot />
 		</main>
 		<Footer />
+		<Analytics />
+		<SpeedInsights />
 	</body>
 </html>
