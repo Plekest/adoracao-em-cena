@@ -1,0 +1,153 @@
+---
+const slides = [1, 2, 3, 4, 5];
+---
+
+<section class="carrossel section" id="galeria">
+	<div class="container carrossel__heading">
+		<p class="eyebrow">Bastidores</p>
+		<h2>Nossos momentos em cena</h2>
+		<p class="carrossel__sub">
+			Em breve, fotos reais do grupo entram aqui. Por enquanto, veja como o carrossel vai se comportar.
+		</p>
+	</div>
+
+	<div class="carrossel__viewport">
+		<div class="carrossel__track" id="carrossel-track">
+			{
+				slides.map((n) => (
+					<figure class="carrossel__slide" style={`--hue: ${n}`}>
+						<span class="carrossel__slide-index">{String(n).padStart(2, "0")}</span>
+						<figcaption>Foto do grupo em breve</figcaption>
+					</figure>
+				))
+			}
+		</div>
+	</div>
+
+	<div class="container carrossel__controls">
+		<button type="button" id="carrossel-prev" aria-label="Slide anterior">←</button>
+		<button type="button" id="carrossel-next" aria-label="Próximo slide">→</button>
+	</div>
+</section>
+
+<style>
+	.carrossel__heading {
+		margin-bottom: var(--space-md);
+	}
+
+	.carrossel__sub {
+		color: var(--color-pearl-dim);
+		max-width: 50ch;
+	}
+
+	.carrossel__viewport {
+		width: 100%;
+	}
+
+	.carrossel__track {
+		display: flex;
+		gap: var(--space-sm);
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		padding-inline: max(1rem, calc((100vw - var(--container-width)) / 2));
+		padding-block: 0.5rem;
+		scrollbar-width: none;
+	}
+
+	.carrossel__track::-webkit-scrollbar {
+		display: none;
+	}
+
+	.carrossel__slide {
+		flex: 0 0 min(340px, 80vw);
+		aspect-ratio: 4 / 5;
+		scroll-snap-align: start;
+		border-radius: 16px;
+		border: 1px solid rgba(201, 166, 107, 0.2);
+		background: linear-gradient(
+			160deg,
+			color-mix(in srgb, var(--color-crimson) calc(10% + var(--hue) * 3%), var(--color-obsidian-soft)),
+			var(--color-obsidian) 80%
+		);
+		margin: 0;
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		padding: var(--space-md);
+		overflow: hidden;
+	}
+
+	.carrossel__slide-index {
+		position: absolute;
+		top: var(--space-sm);
+		left: var(--space-sm);
+		font-family: var(--font-display);
+		font-size: 2rem;
+		color: rgba(201, 166, 107, 0.35);
+	}
+
+	.carrossel__slide figcaption {
+		color: var(--color-pearl-dim);
+		font-size: 0.9rem;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	.carrossel__controls {
+		display: flex;
+		gap: var(--space-sm);
+		margin-top: var(--space-md);
+	}
+
+	.carrossel__controls button {
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		border: 1px solid var(--color-sand);
+		background: transparent;
+		color: var(--color-sand);
+		font-size: 1.1rem;
+		cursor: pointer;
+		transition: background-color 0.3s var(--ease-dramatic), color 0.3s var(--ease-dramatic);
+	}
+
+	.carrossel__controls button:hover {
+		background: var(--color-sand);
+		color: var(--color-obsidian);
+	}
+</style>
+
+<script>
+	import { gsap } from "../../scripts/gsap-setup";
+
+	const track = document.getElementById("carrossel-track");
+	const prev = document.getElementById("carrossel-prev");
+	const next = document.getElementById("carrossel-next");
+
+	const scrollByStep = (dir: number) => {
+		if (!track) return;
+		const slide = track.querySelector(".carrossel__slide");
+		const step = slide ? slide.clientWidth + 16 : 300;
+		track.scrollBy({ left: dir * step, behavior: "smooth" });
+	};
+
+	prev?.addEventListener("click", () => scrollByStep(-1));
+	next?.addEventListener("click", () => scrollByStep(1));
+
+	gsap.fromTo(
+		".carrossel__slide",
+		{ opacity: 0, y: 30 },
+		{
+			opacity: 1,
+			y: 0,
+			duration: 0.7,
+			stagger: 0.08,
+			ease: "power3.out",
+			scrollTrigger: {
+				trigger: "#galeria",
+				start: "top 80%",
+			},
+		}
+	);
+</script>

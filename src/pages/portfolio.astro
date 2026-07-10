@@ -1,0 +1,161 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const pecas = (await getCollection("portfolio")).sort((a, b) => {
+	const dataA = a.data.data ? new Date(a.data.data).getTime() : 0;
+	const dataB = b.data.data ? new Date(b.data.data).getTime() : 0;
+	return dataB - dataA;
+});
+---
+
+<BaseLayout
+	title="Portfólio — Adoração em Cena"
+	description="Conheça as peças e apresentações do grupo de drama Adoração em Cena."
+>
+	<section class="portfolio-hero section">
+		<div class="container">
+			<p class="eyebrow reveal">Nosso trabalho</p>
+			<h1 class="reveal">Portfólio</h1>
+			<p class="portfolio-hero__intro reveal">
+				Cada peça carrega uma mensagem, um propósito e muita entrega do grupo. Em breve, este espaço vai
+				reunir tudo que já colocamos em cena — com fotos, vídeos e a história por trás de cada apresentação.
+			</p>
+		</div>
+	</section>
+
+	{
+		pecas.length === 0 ? (
+			<section class="section em-breve">
+				<div class="container em-breve__inner reveal">
+					<span class="em-breve__icone" aria-hidden="true">
+						✦
+					</span>
+					<h2>Em breve, novidades em cena</h2>
+					<p>
+						Estamos organizando o material das nossas peças para trazer tudo aqui: fotos, vídeos e
+						descrições. Enquanto isso, acompanhe os bastidores no{" "}
+						<a href="https://www.instagram.com/t7adoracaoemcena/" target="_blank" rel="noopener noreferrer">
+							Instagram
+						</a>
+						.
+					</p>
+				</div>
+			</section>
+		) : (
+			<section class="section">
+				<div class="container portfolio-grid">
+					{pecas.map((peca) => (
+						<a href={`/portfolio/${peca.id}`} class="peca-card">
+							{peca.data.fotos[0] && (
+								<img src={peca.data.fotos[0]} alt={peca.data.titulo} loading="lazy" />
+							)}
+							<div class="peca-card__body">
+								<h2>{peca.data.titulo}</h2>
+								<p>{peca.data.descricao}</p>
+								<span class="peca-card__link">Ver detalhes →</span>
+							</div>
+						</a>
+					))}
+				</div>
+			</section>
+		)
+	}
+</BaseLayout>
+
+<style>
+	.portfolio-hero {
+		padding-bottom: var(--space-md);
+		text-align: center;
+	}
+
+	.portfolio-hero__intro {
+		color: var(--color-pearl-dim);
+		max-width: 55ch;
+		margin-inline: auto;
+	}
+
+	.em-breve {
+		text-align: center;
+	}
+
+	.em-breve__inner {
+		max-width: 40rem;
+		margin-inline: auto;
+		padding: var(--space-xl) var(--space-md);
+		border: 1px dashed rgba(201, 166, 107, 0.3);
+		border-radius: 16px;
+	}
+
+	.em-breve__icone {
+		display: block;
+		font-size: 2rem;
+		color: var(--color-sand);
+		margin-bottom: var(--space-sm);
+	}
+
+	.em-breve p {
+		color: var(--color-pearl-dim);
+	}
+
+	.em-breve a {
+		color: var(--color-crimson-bright);
+		text-decoration: underline;
+	}
+
+	.portfolio-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: var(--space-md);
+	}
+
+	.peca-card {
+		display: block;
+		border: 1px solid rgba(201, 166, 107, 0.2);
+		border-radius: 16px;
+		overflow: hidden;
+		background: var(--color-obsidian-soft);
+		transition: transform 0.35s var(--ease-dramatic), border-color 0.35s var(--ease-dramatic);
+	}
+
+	.peca-card:hover {
+		transform: translateY(-4px);
+		border-color: var(--color-sand);
+	}
+
+	.peca-card img {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+	}
+
+	.peca-card__body {
+		padding: var(--space-md);
+	}
+
+	.peca-card__body h2 {
+		font-size: 1.2rem;
+	}
+
+	.peca-card__body p {
+		color: var(--color-pearl-dim);
+		font-size: 0.95rem;
+	}
+
+	.peca-card__link {
+		display: inline-block;
+		margin-top: 0.5rem;
+		color: var(--color-sand);
+		font-size: 0.85rem;
+	}
+</style>
+
+<script>
+	import { gsap } from "../scripts/gsap-setup";
+
+	gsap.fromTo(
+		".reveal",
+		{ opacity: 0, y: 24 },
+		{ opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out" }
+	);
+</script>

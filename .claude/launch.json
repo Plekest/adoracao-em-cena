@@ -1,0 +1,16 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "adoracao-dev",
+      "runtimeExecutable": "wsl.exe",
+      "runtimeArgs": [
+        "-e",
+        "bash",
+        "-lc",
+        "export NVM_DIR=$HOME/.nvm; . $NVM_DIR/nvm.sh; nvm use 22 >/dev/null; cd ~/adoracaoemcena && npm run dev -- --host --port 4322"
+      ],
+      "port": 4322
+    }
+  ]
+}

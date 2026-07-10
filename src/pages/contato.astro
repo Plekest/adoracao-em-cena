@@ -1,0 +1,126 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const canais = [
+	{
+		nome: "WhatsApp",
+		valor: "Fale com a gente",
+		// TODO: trocar pelo número real do grupo, formato só dígitos com DDI (ex: 5511999999999)
+		href: "https://wa.me/5511999999999",
+		icone: "💬",
+	},
+	{
+		nome: "Instagram",
+		valor: "@t7adoracaoemcena",
+		href: "https://www.instagram.com/t7adoracaoemcena/",
+		icone: "📷",
+	},
+	{
+		nome: "E-mail",
+		valor: "contato@adoracaoemcena.com.br",
+		// TODO: trocar pelo e-mail real do grupo
+		href: "mailto:contato@adoracaoemcena.com.br",
+		icone: "✉️",
+	},
+];
+---
+
+<BaseLayout title="Contato — Adoração em Cena" description="Fale com o grupo Adoração em Cena pelo WhatsApp, Instagram ou e-mail.">
+	<section class="contato section">
+		<div class="container contato__inner">
+			<p class="eyebrow reveal">Fale com a gente</p>
+			<h1 class="reveal">Vamos conversar</h1>
+			<p class="contato__intro reveal">
+				Dúvidas, convites para apresentações ou só quer bater um papo sobre o grupo? Escolha o canal que
+				preferir.
+			</p>
+
+			<div class="contato__grid">
+				{
+					canais.map((canal) => (
+						<a
+							class="canal-card reveal"
+							href={canal.href}
+							target={canal.href.startsWith("http") ? "_blank" : undefined}
+							rel={canal.href.startsWith("http") ? "noopener noreferrer" : undefined}
+						>
+							<span class="canal-card__icone" aria-hidden="true">
+								{canal.icone}
+							</span>
+							<h2>{canal.nome}</h2>
+							<p>{canal.valor}</p>
+						</a>
+					))
+				}
+			</div>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.contato {
+		min-height: 80vh;
+		display: flex;
+		align-items: center;
+	}
+
+	.contato__inner {
+		text-align: center;
+	}
+
+	.contato__intro {
+		color: var(--color-pearl-dim);
+		max-width: 40ch;
+		margin-inline: auto;
+	}
+
+	.contato__grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: var(--space-md);
+		margin-top: var(--space-lg);
+		max-width: 50rem;
+		margin-inline: auto;
+	}
+
+	.canal-card {
+		padding: var(--space-lg) var(--space-md);
+		border: 1px solid rgba(201, 166, 107, 0.2);
+		border-radius: 16px;
+		background: linear-gradient(180deg, rgba(201, 166, 107, 0.05), transparent);
+		transition: transform 0.35s var(--ease-dramatic), border-color 0.35s var(--ease-dramatic);
+	}
+
+	.canal-card:hover {
+		transform: translateY(-6px);
+		border-color: var(--color-sand);
+	}
+
+	.canal-card__icone {
+		font-size: 2rem;
+		display: block;
+		margin-bottom: var(--space-sm);
+	}
+
+	.canal-card h2 {
+		font-size: 1.2rem;
+		margin-bottom: 0.35rem;
+	}
+
+	.canal-card p {
+		color: var(--color-pearl-dim);
+		font-size: 0.9rem;
+		margin: 0;
+		word-break: break-word;
+	}
+</style>
+
+<script>
+	import { gsap } from "../scripts/gsap-setup";
+
+	gsap.fromTo(
+		".contato .reveal",
+		{ opacity: 0, y: 24 },
+		{ opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out" }
+	);
+</script>

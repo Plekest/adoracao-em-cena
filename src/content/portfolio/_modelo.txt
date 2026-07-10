@@ -1,0 +1,18 @@
+Para adicionar uma peça ao portfólio, crie um arquivo .md nesta pasta (ex: nome-da-peca.md) com este formato:
+
+---
+titulo: "Nome da peça"
+descricao: "Uma descrição curta sobre a peça, o tema e a proposta."
+fotos:
+  - "/portfolio/nome-da-peca-1.jpg"
+  - "/portfolio/nome-da-peca-2.jpg"
+video: "https://youtube.com/..." # opcional
+data: 2026-08-15 # opcional
+---
+
+O texto em markdown ABAIXO do segundo --- é o ROTEIRO da peça — aparece
+inteiro na página de detalhes (/portfolio/nome-da-peca), na seção "Roteiro".
+Pode usar parágrafos, negrito, etc. normalmente em markdown.
+
+As fotos devem ser colocadas em public/portfolio/.
+Este arquivo (_modelo.txt) é só um guia e é ignorado pelo site (não tem extensão .md).

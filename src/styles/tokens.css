@@ -1,0 +1,24 @@
+:root {
+	/* Poison & Pearls */
+	--color-obsidian: #0d0b0c;
+	--color-obsidian-soft: #161213;
+	--color-crimson: #8c1d2b;
+	--color-crimson-bright: #b32c3d;
+	--color-sand: #c9a66b;
+	--color-sand-soft: #e3c893;
+	--color-pearl: #f2ece4;
+	--color-pearl-dim: rgba(242, 236, 228, 0.7);
+
+	--font-display: "Playfair Display", Georgia, serif;
+	--font-body: "Inter", system-ui, sans-serif;
+
+	--container-width: min(72rem, 92vw);
+
+	--space-xs: 0.5rem;
+	--space-sm: 1rem;
+	--space-md: 2rem;
+	--space-lg: 4rem;
+	--space-xl: 8rem;
+
+	--ease-dramatic: cubic-bezier(0.16, 1, 0.3, 1);
+}

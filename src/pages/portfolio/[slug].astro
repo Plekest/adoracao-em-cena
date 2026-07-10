@@ -1,0 +1,150 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Galeria from "../../components/portfolio/Galeria.astro";
+
+export async function getStaticPaths() {
+	const pecas = await getCollection("portfolio");
+	return pecas.map((peca) => ({
+		params: { slug: peca.id },
+		props: { peca },
+	}));
+}
+
+const { peca } = Astro.props;
+const { Content } = await render(peca);
+
+function toYoutubeEmbed(url: string): string | null {
+	const watch = url.match(/[?&]v=([^&]+)/);
+	if (watch) return `https://www.youtube.com/embed/${watch[1]}`;
+	const short = url.match(/youtu\.be\/([^?&]+)/);
+	if (short) return `https://www.youtube.com/embed/${short[1]}`;
+	return null;
+}
+
+const embedUrl = peca.data.video ? toYoutubeEmbed(peca.data.video) : null;
+---
+
+<BaseLayout
+	title={`${peca.data.titulo} — Portfólio — Adoração em Cena`}
+	description={peca.data.descricao}
+>
+	<section class="peca-hero section">
+		<div class="container">
+			<a href="/portfolio" class="voltar reveal">← Voltar ao portfólio</a>
+			<p class="eyebrow reveal">Peça</p>
+			<h1 class="reveal">{peca.data.titulo}</h1>
+			<p class="peca-hero__desc reveal">{peca.data.descricao}</p>
+		</div>
+	</section>
+
+	{
+		peca.data.video && (
+			<section class="section peca-video">
+				<div class="container">
+					<h2>Assista</h2>
+					{embedUrl ? (
+						<div class="peca-video__frame">
+							<iframe
+								src={embedUrl}
+								title={`Vídeo: ${peca.data.titulo}`}
+								loading="lazy"
+								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen
+							/>
+						</div>
+					) : (
+						<video class="peca-video__nativo" controls src={peca.data.video} />
+					)}
+				</div>
+			</section>
+		)
+	}
+
+	{
+		peca.data.fotos.length > 0 && (
+			<section class="section">
+				<div class="container">
+					<h2>Galeria</h2>
+					<Galeria fotos={peca.data.fotos} titulo={peca.data.titulo} />
+				</div>
+			</section>
+		)
+	}
+
+	<section class="section peca-roteiro">
+		<div class="container">
+			<h2>Roteiro</h2>
+			<div class="peca-roteiro__conteudo">
+				<Content />
+			</div>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.peca-hero {
+		padding-bottom: var(--space-md);
+	}
+
+	.voltar {
+		display: inline-block;
+		color: var(--color-pearl-dim);
+		font-size: 0.9rem;
+		margin-bottom: var(--space-md);
+		transition: color 0.3s var(--ease-dramatic);
+	}
+
+	.voltar:hover {
+		color: var(--color-sand);
+	}
+
+	.peca-hero__desc {
+		color: var(--color-pearl-dim);
+		max-width: 60ch;
+		font-size: 1.05rem;
+	}
+
+	.peca-video__frame {
+		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		border-radius: 16px;
+		overflow: hidden;
+		border: 1px solid rgba(201, 166, 107, 0.2);
+	}
+
+	.peca-video__frame iframe {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		border: 0;
+	}
+
+	.peca-video__nativo {
+		width: 100%;
+		border-radius: 16px;
+		border: 1px solid rgba(201, 166, 107, 0.2);
+	}
+
+	.peca-roteiro__conteudo {
+		color: var(--color-pearl-dim);
+		max-width: 65ch;
+		line-height: 1.8;
+	}
+
+	.peca-roteiro__conteudo :global(p) {
+		margin-bottom: var(--space-sm);
+	}
+</style>
+
+<script>
+	import { gsap } from "../../scripts/gsap-setup";
+
+	gsap.fromTo(
+		".reveal",
+		{ opacity: 0, y: 24 },
+		{ opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out" }
+	);
+</script>

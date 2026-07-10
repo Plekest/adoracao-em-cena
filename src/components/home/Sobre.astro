@@ -1,0 +1,103 @@
+---
+const valores = [
+	{
+		titulo: "Fé em cena",
+		texto: "Cada peça nasce de um propósito: comunicar mensagens de fé através da linguagem do teatro.",
+	},
+	{
+		titulo: "Arte com excelência",
+		texto: "Figurino, cenário, trilha e atuação são construídos com cuidado para entregar uma experiência completa.",
+	},
+	{
+		titulo: "Comunidade viva",
+		texto: "Somos um grupo que cresce junto — ensaiando, criando e se apresentando como uma família.",
+	},
+];
+---
+
+<section class="sobre section" id="sobre">
+	<div class="container sobre__grid">
+		<div class="sobre__intro reveal">
+			<p class="eyebrow">Quem somos</p>
+			<h2>Adoração em Cena</h2>
+			<p class="sobre__texto">
+				Somos um grupo de drama que transforma fé em movimento, palavra e expressão. No palco, contamos
+				histórias que tocam o coração e apontam para algo maior — usando teatro, dança e arte cênica como
+				ponte entre a mensagem e quem assiste.
+			</p>
+		</div>
+
+		<div class="sobre__valores">
+			{
+				valores.map((valor) => (
+					<article class="valor-card reveal">
+						<h3>{valor.titulo}</h3>
+						<p>{valor.texto}</p>
+					</article>
+				))
+			}
+		</div>
+	</div>
+</section>
+
+<style>
+	.sobre__grid {
+		display: grid;
+		gap: var(--space-lg);
+	}
+
+	.sobre__intro {
+		max-width: 60ch;
+	}
+
+	.sobre__texto {
+		color: var(--color-pearl-dim);
+		font-size: 1.05rem;
+	}
+
+	.sobre__valores {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: var(--space-md);
+	}
+
+	.valor-card {
+		padding: var(--space-md);
+		border: 1px solid rgba(201, 166, 107, 0.18);
+		border-radius: 12px;
+		background: linear-gradient(180deg, rgba(201, 166, 107, 0.05), transparent);
+	}
+
+	.valor-card h3 {
+		font-size: 1.15rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.valor-card p {
+		color: var(--color-pearl-dim);
+		font-size: 0.95rem;
+		margin: 0;
+	}
+</style>
+
+<script>
+	import { gsap } from "../../scripts/gsap-setup";
+
+	document.querySelectorAll(".sobre .reveal").forEach((el, i) => {
+		gsap.fromTo(
+			el,
+			{ opacity: 0, y: 40 },
+			{
+				opacity: 1,
+				y: 0,
+				duration: 0.9,
+				ease: "power3.out",
+				delay: i * 0.05,
+				scrollTrigger: {
+					trigger: el,
+					start: "top 85%",
+				},
+			}
+		);
+	});
+</script>
