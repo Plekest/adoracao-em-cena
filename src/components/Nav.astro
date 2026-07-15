@@ -2,6 +2,7 @@
 const links = [
 	{ href: "/", label: "Início" },
 	{ href: "/portfolio", label: "Portfólio" },
+	{ href: "/integrantes", label: "Integrantes" },
 	{ href: "/contato", label: "Contato" },
 ];
 const currentPath = Astro.url.pathname;
@@ -9,7 +10,7 @@ const currentPath = Astro.url.pathname;
 
 <header class="nav" id="site-nav">
 	<div class="nav__inner container">
-		<a href="/" class="nav__brand" aria-label="Adoração em Cena — início">
+		<a href="/" class="nav__brand" aria-label="Adoração em Cena - início">
 			<img src="/logo.svg" alt="Adoração em Cena" width="180" height="64" />
 		</a>
 

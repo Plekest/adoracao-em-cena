@@ -2,15 +2,24 @@ Para adicionar uma peça ao portfólio, crie um arquivo .md nesta pasta (ex: nom
 
 ---
 titulo: "Nome da peça"
-descricao: "Uma descrição curta sobre a peça, o tema e a proposta."
+descricao: "Descrição curta usada em SEO e nos metadados da página."
+sinopse: "Sinopse curta (3 a 4 linhas) focada em prender a atenção e gerar curiosidade sobre o enredo dramático."
+classificacao: "Ex: Livre, 12 anos"
+diretor: "Nome do diretor"
+dramaturgo: "Nome do dramaturgo"
+atores:
+  - "Nome do ator/atriz 1"
+  - "Nome do ator/atriz 2"
+genero: "Ex: Drama Social, Drama Poético"
+duracao: "Ex: 45 min"
 fotos:
   - "/portfolio/nome-da-peca-1.jpg"
   - "/portfolio/nome-da-peca-2.jpg"
-video: "https://youtube.com/..." # opcional
+video: "https://youtube.com/..." # link direto do teaser (1 min), opcional
 data: 2026-08-15 # opcional
 ---
 
-O texto em markdown ABAIXO do segundo --- é o ROTEIRO da peça — aparece
+O texto em markdown ABAIXO do segundo --- é o ROTEIRO da peça - aparece
 inteiro na página de detalhes (/portfolio/nome-da-peca), na seção "Roteiro".
 Pode usar parágrafos, negrito, etc. normalmente em markdown.
 

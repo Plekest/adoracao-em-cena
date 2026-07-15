@@ -1,0 +1,100 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+	peca: CollectionEntry<"portfolio">;
+	desbloqueada: boolean;
+}
+
+const { peca, desbloqueada } = Astro.props;
+---
+
+{
+	desbloqueada ? (
+		<a href={`/portfolio/${peca.id}`} class="peca-card">
+			{peca.data.fotos[0] && <img src={peca.data.fotos[0]} alt={peca.data.titulo} loading="lazy" />}
+			<div class="peca-card__body">
+				<h3>{peca.data.titulo}</h3>
+				<p>{peca.data.descricao}</p>
+				<span class="peca-card__link">Ver detalhes →</span>
+			</div>
+		</a>
+	) : (
+		<div class="peca-card peca-card--bloqueada" aria-disabled="true">
+			{peca.data.fotos[0] && <img src={peca.data.fotos[0]} alt={peca.data.titulo} loading="lazy" />}
+			<div class="peca-card__body">
+				<h3>{peca.data.titulo}</h3>
+				<p>{peca.data.descricao}</p>
+				<span class="peca-card__badge">Em breve</span>
+			</div>
+		</div>
+	)
+}
+
+<style>
+	.peca-card {
+		display: block;
+		border: 1px solid rgba(201, 166, 107, 0.2);
+		border-radius: 16px;
+		overflow: hidden;
+		background: var(--color-obsidian-soft);
+		transition: transform 0.35s var(--ease-dramatic), border-color 0.35s var(--ease-dramatic);
+	}
+
+	.peca-card:hover {
+		transform: translateY(-4px);
+		border-color: var(--color-sand);
+	}
+
+	.peca-card--bloqueada {
+		cursor: default;
+	}
+
+	.peca-card--bloqueada:hover {
+		transform: none;
+		border-color: rgba(201, 166, 107, 0.2);
+	}
+
+	.peca-card--bloqueada img {
+		filter: grayscale(0.6);
+		opacity: 0.6;
+	}
+
+	.peca-card img {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+	}
+
+	.peca-card__body {
+		padding: var(--space-md);
+	}
+
+	.peca-card__body h3 {
+		font-size: 1.2rem;
+	}
+
+	.peca-card__body p {
+		color: var(--color-pearl-dim);
+		font-size: 0.95rem;
+	}
+
+	.peca-card__link {
+		display: inline-block;
+		margin-top: 0.5rem;
+		color: var(--color-sand);
+		font-size: 0.85rem;
+	}
+
+	.peca-card__badge {
+		display: inline-block;
+		margin-top: 0.5rem;
+		padding: 0.2rem 0.6rem;
+		border: 1px solid rgba(201, 166, 107, 0.3);
+		border-radius: 999px;
+		color: var(--color-pearl-dim);
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+</style>

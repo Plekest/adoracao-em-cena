@@ -1,0 +1,12 @@
+Para adicionar um integrante à página Equipe, crie um arquivo .md nesta pasta (ex: nome-sobrenome.md) com este formato:
+
+---
+nome: "Nome da pessoa"
+foto: "/equipe/nome-sobrenome.jpg"
+bio: "Mensagem bem curta que defina a pessoa."
+instagram: "https://instagram.com/usuario" # opcional
+ordem: 1 # opcional, define a posição na grade (menor = primeiro)
+---
+
+A foto deve ser colocada em public/equipe/.
+Este arquivo (_modelo.txt) é só um guia e é ignorado pelo site (não tem extensão .md).

@@ -1,0 +1,171 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const integrantes = (await getCollection("equipe")).sort((a, b) => a.data.ordem - b.data.ordem);
+---
+
+<BaseLayout
+	title="Integrantes - Adoração em Cena"
+	description="Conheça quem forma o grupo de drama Adoração em Cena."
+>
+	<section class="equipe-hero section">
+		<div class="container">
+			<p class="eyebrow reveal">Quem somos</p>
+			<h1 class="reveal">Integrantes</h1>
+			<p class="equipe-hero__intro reveal">As pessoas que dão vida a cada peça, dentro e fora do palco.</p>
+		</div>
+	</section>
+
+	{
+		integrantes.length === 0 ? (
+			<section class="section em-breve">
+				<div class="container em-breve__inner reveal">
+					<span class="em-breve__icone" aria-hidden="true">
+						✦
+					</span>
+					<h2>Em breve, os integrantes completos</h2>
+					<p>Estamos organizando as fotos e bios de cada integrante.</p>
+				</div>
+			</section>
+		) : (
+			<section class="section">
+				<div class="container equipe-grid">
+					{integrantes.map((pessoa) => {
+						const handle = pessoa.data.instagram
+							? new URL(pessoa.data.instagram).pathname.replace(/\//g, "")
+							: null;
+						return (
+							<div class="pessoa-card reveal">
+								<img src={pessoa.data.foto} alt={pessoa.data.nome} loading="lazy" />
+								<div class="pessoa-card__body">
+									<h2>{pessoa.data.nome}</h2>
+									{pessoa.data.bio && <p>{pessoa.data.bio}</p>}
+									{handle && (
+										<a
+											href={pessoa.data.instagram}
+											target="_blank"
+											rel="noopener noreferrer"
+											class="pessoa-card__insta"
+										>
+											<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+												<rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6" />
+												<circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6" />
+												<circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" />
+											</svg>
+											@{handle}
+										</a>
+									)}
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</section>
+		)
+	}
+</BaseLayout>
+
+<style>
+	.equipe-hero {
+		padding-bottom: var(--space-md);
+		text-align: center;
+	}
+
+	.equipe-hero__intro {
+		color: var(--color-pearl-dim);
+		max-width: 55ch;
+		margin-inline: auto;
+	}
+
+	.em-breve {
+		text-align: center;
+	}
+
+	.em-breve__inner {
+		max-width: 40rem;
+		margin-inline: auto;
+		padding: var(--space-xl) var(--space-md);
+		border: 1px dashed rgba(201, 166, 107, 0.3);
+		border-radius: 16px;
+	}
+
+	.em-breve__icone {
+		display: block;
+		font-size: 2rem;
+		color: var(--color-sand);
+		margin-bottom: var(--space-sm);
+	}
+
+	.em-breve p {
+		color: var(--color-pearl-dim);
+	}
+
+	.equipe-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: var(--space-md);
+	}
+
+	.pessoa-card {
+		border: 1px solid rgba(201, 166, 107, 0.2);
+		border-radius: 16px;
+		overflow: hidden;
+		background: var(--color-obsidian-soft);
+		transition: transform 0.35s var(--ease-dramatic), border-color 0.35s var(--ease-dramatic);
+	}
+
+	.pessoa-card:hover {
+		transform: translateY(-4px);
+		border-color: var(--color-sand);
+	}
+
+	.pessoa-card img {
+		width: 100%;
+		aspect-ratio: 1 / 1;
+		object-fit: cover;
+	}
+
+	.pessoa-card__body {
+		padding: var(--space-md);
+	}
+
+	.pessoa-card__body h2 {
+		font-size: 1.1rem;
+	}
+
+	.pessoa-card__body p {
+		color: var(--color-pearl-dim);
+		font-size: 0.9rem;
+	}
+
+	.pessoa-card__insta {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		margin-top: 0.5rem;
+		color: var(--color-crimson-bright);
+		font-size: 0.85rem;
+		transition: color 0.3s var(--ease-dramatic);
+	}
+
+	.pessoa-card__insta:hover {
+		color: var(--color-sand);
+	}
+
+	.pessoa-card__insta svg {
+		width: 15px;
+		height: 15px;
+		flex-shrink: 0;
+	}
+</style>
+
+<script>
+	import { gsap } from "../scripts/gsap-setup";
+
+	gsap.fromTo(
+		".reveal",
+		{ opacity: 0, y: 24 },
+		{ opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out" }
+	);
+</script>

@@ -1,8 +1,12 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import PecaCard from "../components/portfolio/PecaCard.astro";
+import { pecaDesbloqueada } from "../lib/portfolio";
 
 const pecas = (await getCollection("portfolio")).sort((a, b) => {
+	if (a.id === "power-of-love") return -1;
+	if (b.id === "power-of-love") return 1;
 	const dataA = a.data.data ? new Date(a.data.data).getTime() : 0;
 	const dataB = b.data.data ? new Date(b.data.data).getTime() : 0;
 	return dataB - dataA;
@@ -10,7 +14,7 @@ const pecas = (await getCollection("portfolio")).sort((a, b) => {
 ---
 
 <BaseLayout
-	title="Portfólio — Adoração em Cena"
+	title="Portfólio - Adoração em Cena"
 	description="Conheça as peças e apresentações do grupo de drama Adoração em Cena."
 >
 	<section class="portfolio-hero section">
@@ -19,7 +23,7 @@ const pecas = (await getCollection("portfolio")).sort((a, b) => {
 			<h1 class="reveal">Portfólio</h1>
 			<p class="portfolio-hero__intro reveal">
 				Cada peça carrega uma mensagem, um propósito e muita entrega do grupo. Em breve, este espaço vai
-				reunir tudo que já colocamos em cena — com fotos, vídeos e a história por trás de cada apresentação.
+				reunir tudo que já colocamos em cena - com fotos, vídeos e a história por trás de cada apresentação.
 			</p>
 		</div>
 	</section>
@@ -46,16 +50,7 @@ const pecas = (await getCollection("portfolio")).sort((a, b) => {
 			<section class="section">
 				<div class="container portfolio-grid">
 					{pecas.map((peca) => (
-						<a href={`/portfolio/${peca.id}`} class="peca-card">
-							{peca.data.fotos[0] && (
-								<img src={peca.data.fotos[0]} alt={peca.data.titulo} loading="lazy" />
-							)}
-							<div class="peca-card__body">
-								<h2>{peca.data.titulo}</h2>
-								<p>{peca.data.descricao}</p>
-								<span class="peca-card__link">Ver detalhes →</span>
-							</div>
-						</a>
+						<PecaCard peca={peca} desbloqueada={pecaDesbloqueada(peca.id)} />
 					))}
 				</div>
 			</section>
@@ -107,46 +102,6 @@ const pecas = (await getCollection("portfolio")).sort((a, b) => {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 		gap: var(--space-md);
-	}
-
-	.peca-card {
-		display: block;
-		border: 1px solid rgba(201, 166, 107, 0.2);
-		border-radius: 16px;
-		overflow: hidden;
-		background: var(--color-obsidian-soft);
-		transition: transform 0.35s var(--ease-dramatic), border-color 0.35s var(--ease-dramatic);
-	}
-
-	.peca-card:hover {
-		transform: translateY(-4px);
-		border-color: var(--color-sand);
-	}
-
-	.peca-card img {
-		width: 100%;
-		aspect-ratio: 4 / 3;
-		object-fit: cover;
-	}
-
-	.peca-card__body {
-		padding: var(--space-md);
-	}
-
-	.peca-card__body h2 {
-		font-size: 1.2rem;
-	}
-
-	.peca-card__body p {
-		color: var(--color-pearl-dim);
-		font-size: 0.95rem;
-	}
-
-	.peca-card__link {
-		display: inline-block;
-		margin-top: 0.5rem;
-		color: var(--color-sand);
-		font-size: 0.85rem;
 	}
 </style>
 

@@ -1,0 +1,84 @@
+---
+import { generos } from "../../lib/generos";
+
+interface Props {
+	nome: string;
+}
+
+const { nome } = Astro.props;
+const info = generos[nome];
+---
+
+<span class="genero-tag" tabindex={info ? 0 : undefined}>
+	{nome}
+	{
+		info && (
+			<>
+				<svg class="genero-tag__icone" aria-hidden="true" viewBox="0 0 16 16" fill="none">
+					<circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" />
+					<path
+						d="M6.1 6.1c0-1.05.85-1.7 1.9-1.7s1.9.55 1.9 1.5c0 1.3-1.9 1.25-1.9 2.75"
+						stroke="currentColor"
+						stroke-width="1.2"
+						stroke-linecap="round"
+					/>
+					<circle cx="8" cy="11.3" r="0.15" fill="currentColor" stroke="currentColor" stroke-width="0.9" />
+				</svg>
+				<span class="genero-tag__tooltip" role="tooltip">
+					{info.definicao}
+				</span>
+			</>
+		)
+	}
+</span>
+
+<style>
+	.genero-tag {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35em;
+		padding: 0.3rem 0.8rem;
+		border: 1px solid rgba(201, 166, 107, 0.35);
+		border-radius: 999px;
+		color: var(--color-sand);
+		font-size: 0.78rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		cursor: help;
+	}
+
+	.genero-tag__icone {
+		width: 0.95em;
+		height: 0.95em;
+		flex-shrink: 0;
+	}
+
+	.genero-tag__tooltip {
+		display: none;
+		position: absolute;
+		bottom: calc(100% + 0.5rem);
+		left: 50%;
+		transform: translateX(-50%);
+		width: max-content;
+		max-width: 260px;
+		padding: 0.6rem 0.8rem;
+		border: 1px solid rgba(201, 166, 107, 0.35);
+		border-radius: 10px;
+		background: var(--color-obsidian-soft);
+		color: var(--color-pearl-dim);
+		font-size: 0.78rem;
+		font-weight: 400;
+		text-transform: none;
+		letter-spacing: normal;
+		line-height: 1.4;
+		box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.6);
+		z-index: 10;
+	}
+
+	.genero-tag:hover .genero-tag__tooltip,
+	.genero-tag:focus .genero-tag__tooltip,
+	.genero-tag:focus-visible .genero-tag__tooltip {
+		display: block;
+	}
+</style>

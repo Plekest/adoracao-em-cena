@@ -1,7 +1,10 @@
 ---
-import { getCollection, render } from "astro:content";
+import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Galeria from "../../components/portfolio/Galeria.astro";
+import GeneroTag from "../../components/portfolio/GeneroTag.astro";
+import PecaCard from "../../components/portfolio/PecaCard.astro";
+import { pecaDesbloqueada } from "../../lib/portfolio";
 
 export async function getStaticPaths() {
 	const pecas = await getCollection("portfolio");
@@ -12,54 +15,193 @@ export async function getStaticPaths() {
 }
 
 const { peca } = Astro.props;
-const { Content } = await render(peca);
 
-function toYoutubeEmbed(url: string): string | null {
+const outras = (await getCollection("portfolio")).filter((p) => p.id !== peca.id);
+
+function getYoutubeId(url: string): string | null {
 	const watch = url.match(/[?&]v=([^&]+)/);
-	if (watch) return `https://www.youtube.com/embed/${watch[1]}`;
+	if (watch) return watch[1];
 	const short = url.match(/youtu\.be\/([^?&]+)/);
-	if (short) return `https://www.youtube.com/embed/${short[1]}`;
+	if (short) return short[1];
 	return null;
 }
 
-const embedUrl = peca.data.video ? toYoutubeEmbed(peca.data.video) : null;
+const videoId = peca.data.video ? getYoutubeId(peca.data.video) : null;
+const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+const temFicha = Boolean(
+	peca.data.diretor || peca.data.dramaturgo || (peca.data.atores && peca.data.atores.length > 0)
+);
 ---
 
 <BaseLayout
-	title={`${peca.data.titulo} — Portfólio — Adoração em Cena`}
+	title={`${peca.data.titulo} - Portfólio - Adoração em Cena`}
 	description={peca.data.descricao}
 >
-	<section class="peca-hero section">
+	<!-- ===== DESKTOP: layout Cartaz ===== -->
+	<section class="peca-a section">
 		<div class="container">
 			<a href="/portfolio" class="voltar reveal">← Voltar ao portfólio</a>
-			<p class="eyebrow reveal">Peça</p>
-			<h1 class="reveal">{peca.data.titulo}</h1>
-			<p class="peca-hero__desc reveal">{peca.data.descricao}</p>
+			<div class="peca-a__layout">
+				{
+					peca.data.video && (
+						<button
+							type="button"
+							class="peca-a__poster reveal"
+							data-video-trigger
+							data-video-id={videoId ?? ""}
+							data-video-src={videoId ? "" : peca.data.video}
+							aria-label={`Assistir teaser de ${peca.data.titulo}`}
+						>
+							{videoId ? (
+								<img src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`} alt="" loading="lazy" />
+							) : (
+								<span class="peca-a__poster-fallback" aria-hidden="true" />
+							)}
+							<span class="play">
+								<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<circle cx="12" cy="12" r="11" fill="rgba(13,11,12,0.55)" stroke="#f2ece4" stroke-opacity="0.6" />
+									<path d="M10 8.5L16 12L10 15.5V8.5Z" fill="#f2ece4" />
+								</svg>
+							</span>
+							{peca.data.duracao && <span class="duration-badge">{peca.data.duracao}</span>}
+						</button>
+					)
+				}
+				<div class="reveal">
+					<h1>{peca.data.titulo}</h1>
+					{
+						(peca.data.classificacao || peca.data.genero || peca.data.duracao) && (
+							<div class="peca-hero__tags">
+								{peca.data.classificacao && <span class="tag tag--classificacao">{peca.data.classificacao}</span>}
+								{peca.data.genero && <GeneroTag nome={peca.data.genero} />}
+								{peca.data.duracao && <span class="tag">{peca.data.duracao}</span>}
+							</div>
+						)
+					}
+					<p class="peca-hero__desc">{peca.data.sinopse ?? peca.data.descricao}</p>
+					<a class="btn btn-ghost" href="/contato">Solicitar roteiro completo →</a>
+				</div>
+			</div>
 		</div>
 	</section>
 
 	{
-		peca.data.video && (
-			<section class="section peca-video">
+		temFicha && (
+			<section class="section peca-a__strip">
 				<div class="container">
-					<h2>Assista</h2>
-					{embedUrl ? (
-						<div class="peca-video__frame">
-							<iframe
-								src={embedUrl}
-								title={`Vídeo: ${peca.data.titulo}`}
-								loading="lazy"
-								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-								allowfullscreen
-							/>
-						</div>
-					) : (
-						<video class="peca-video__nativo" controls src={peca.data.video} />
-					)}
+					<dl class="peca-a__strip-list">
+						{peca.data.diretor && (
+							<div>
+								<dt>Direção</dt>
+								<dd>{peca.data.diretor}</dd>
+							</div>
+						)}
+						{peca.data.dramaturgo && (
+							<div>
+								<dt>Dramaturgia</dt>
+								<dd>{peca.data.dramaturgo}</dd>
+							</div>
+						)}
+						{peca.data.atores && peca.data.atores.length > 0 && (
+							<div>
+								<dt>Elenco</dt>
+								<dd>{peca.data.atores.join(", ")}</dd>
+							</div>
+						)}
+						{peca.data.genero && (
+							<div>
+								<dt>Gênero</dt>
+								<dd>{peca.data.genero}</dd>
+							</div>
+						)}
+						{peca.data.duracao && (
+							<div>
+								<dt>Duração</dt>
+								<dd>{peca.data.duracao}</dd>
+							</div>
+						)}
+					</dl>
 				</div>
 			</section>
 		)
 	}
+
+	<!-- ===== MOBILE: layout Ficha ===== -->
+	<section class="peca-b section">
+		<div class="container">
+			<a href="/portfolio" class="voltar reveal">← Voltar ao portfólio</a>
+			<div class="reveal">
+				{
+					peca.data.video && (
+						<button
+							type="button"
+							class="peca-b__thumb"
+							data-video-trigger
+							data-video-id={videoId ?? ""}
+							data-video-src={videoId ? "" : peca.data.video}
+							aria-label={`Assistir teaser de ${peca.data.titulo}`}
+						>
+							{videoId ? (
+								<img src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`} alt="" loading="lazy" />
+							) : (
+								<span class="peca-a__poster-fallback" aria-hidden="true" />
+							)}
+							<span class="play">
+								<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<circle cx="12" cy="12" r="11" fill="rgba(13,11,12,0.55)" stroke="#f2ece4" stroke-opacity="0.6" />
+									<path d="M10 8.5L16 12L10 15.5V8.5Z" fill="#f2ece4" />
+								</svg>
+							</span>
+							{peca.data.duracao && <span class="duration-badge">{peca.data.duracao}</span>}
+						</button>
+					)
+				}
+				<h1>{peca.data.titulo}</h1>
+				{
+					(peca.data.classificacao || peca.data.genero || peca.data.duracao) && (
+						<div class="peca-hero__tags">
+							{peca.data.classificacao && <span class="tag tag--classificacao">{peca.data.classificacao}</span>}
+							{peca.data.genero && <GeneroTag nome={peca.data.genero} />}
+						</div>
+					)
+				}
+				<p class="peca-hero__desc">{peca.data.sinopse ?? peca.data.descricao}</p>
+
+				{
+					temFicha && (
+						<dl class="peca-b__meta">
+							{peca.data.diretor && (
+								<div class="item">
+									<dt>Direção</dt>
+									<dd>{peca.data.diretor}</dd>
+								</div>
+							)}
+							{peca.data.dramaturgo && (
+								<div class="item">
+									<dt>Dramaturgia</dt>
+									<dd>{peca.data.dramaturgo}</dd>
+								</div>
+							)}
+							{peca.data.atores && peca.data.atores.length > 0 && (
+								<div class="item">
+									<dt>Elenco</dt>
+									<dd>{peca.data.atores.join(", ")}</dd>
+								</div>
+							)}
+							{peca.data.duracao && (
+								<div class="item">
+									<dt>Duração</dt>
+									<dd>{peca.data.duracao}</dd>
+								</div>
+							)}
+						</dl>
+					)
+				}
+
+				<a class="btn btn-ghost" href="/contato">Solicitar roteiro completo →</a>
+			</div>
+		</div>
+	</section>
 
 	{
 		peca.data.fotos.length > 0 && (
@@ -72,21 +214,50 @@ const embedUrl = peca.data.video ? toYoutubeEmbed(peca.data.video) : null;
 		)
 	}
 
-	<section class="section peca-roteiro">
+	<section class="section peca-outras">
 		<div class="container">
-			<h2>Roteiro</h2>
-			<div class="peca-roteiro__conteudo">
-				<Content />
-			</div>
+			<h2>Veja também</h2>
+			{
+				outras.length > 0 ? (
+					<div class="peca-outras__viewport">
+						<button type="button" class="peca-outras__arrow peca-outras__arrow--prev" id="outras-prev" aria-label="Anterior">
+							←
+						</button>
+						<div class="peca-outras__track" id="outras-track">
+							{outras.slice(0, 6).map((p) => (
+								<div class="peca-outras__item">
+									<PecaCard peca={p} desbloqueada={pecaDesbloqueada(p.id)} />
+								</div>
+							))}
+						</div>
+						<button type="button" class="peca-outras__arrow peca-outras__arrow--next" id="outras-next" aria-label="Próximo">
+							→
+						</button>
+					</div>
+				) : (
+					<p class="peca-outras__vazio">
+						Mais peças em breve - acompanhe as novidades no{" "}
+						<a href="https://www.instagram.com/t7adoracaoemcena/" target="_blank" rel="noopener noreferrer">
+							Instagram
+						</a>
+						.
+					</p>
+				)
+			}
 		</div>
 	</section>
+
+	<div class="video-modal" id="video-modal" aria-hidden="true">
+		<button type="button" class="video-modal__close" id="video-modal-close" aria-label="Fechar vídeo">
+			<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+			</svg>
+		</button>
+		<div class="video-modal__frame" id="video-modal-frame"></div>
+	</div>
 </BaseLayout>
 
 <style>
-	.peca-hero {
-		padding-bottom: var(--space-md);
-	}
-
 	.voltar {
 		display: inline-block;
 		color: var(--color-pearl-dim);
@@ -99,43 +270,339 @@ const embedUrl = peca.data.video ? toYoutubeEmbed(peca.data.video) : null;
 		color: var(--color-sand);
 	}
 
+	h1 {
+		margin-bottom: var(--space-xs);
+	}
+
+	.peca-hero__tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-bottom: var(--space-sm);
+	}
+
+	.tag {
+		display: inline-block;
+		padding: 0.3rem 0.8rem;
+		border: 1px solid rgba(201, 166, 107, 0.35);
+		border-radius: 999px;
+		color: var(--color-sand);
+		font-size: 0.78rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.tag--classificacao {
+		border-color: rgba(179, 43, 58, 0.5);
+		color: var(--color-crimson-bright);
+	}
+
 	.peca-hero__desc {
 		color: var(--color-pearl-dim);
 		max-width: 60ch;
 		font-size: 1.05rem;
+		margin-bottom: var(--space-md);
 	}
 
-	.peca-video__frame {
+	.duration-badge {
+		position: absolute;
+		bottom: 0.6rem;
+		right: 0.6rem;
+		background: rgba(13, 11, 12, 0.78);
+		color: var(--color-sand-soft);
+		font-size: 0.7rem;
+		padding: 0.2rem 0.5rem;
+		border-radius: 5px;
+		letter-spacing: 0.03em;
+		pointer-events: none;
+	}
+
+	/* ---------- Desktop: Cartaz ---------- */
+	.peca-b {
+		display: none;
+	}
+
+	.peca-a {
+		padding-bottom: var(--space-sm);
+		background:
+			radial-gradient(ellipse 900px 500px at 25% -20%, rgba(201, 166, 107, 0.14), transparent 60%),
+			var(--color-obsidian);
+	}
+
+	.peca-a__layout {
+		display: grid;
+		grid-template-columns: 220px 1fr;
+		gap: var(--space-lg);
+		align-items: start;
+	}
+
+	.peca-a__poster {
 		position: relative;
+		display: block;
+		aspect-ratio: 2 / 3;
+		border-radius: 10px;
+		overflow: hidden;
+		border: 1px solid rgba(201, 166, 107, 0.25);
+		box-shadow: 0 25px 40px -15px rgba(0, 0, 0, 0.6);
+	}
+
+	.peca-a__poster {
+		padding: 0;
+		background: none;
+		font: inherit;
+		cursor: pointer;
+		width: 100%;
+	}
+
+	.peca-a__poster img,
+	.peca-a__poster-fallback {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center 30%;
+		display: block;
+	}
+
+	.peca-a__poster-fallback {
+		background: linear-gradient(160deg, var(--color-obsidian-soft), var(--color-obsidian));
+	}
+
+	.peca-a__poster .play,
+	.peca-b__thumb .play {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: linear-gradient(180deg, rgba(13, 11, 12, 0.1), rgba(13, 11, 12, 0.65));
+		transition: background 0.3s var(--ease-dramatic);
+	}
+
+	.peca-a__poster:hover .play,
+	.peca-b__thumb:hover .play {
+		background: linear-gradient(180deg, rgba(13, 11, 12, 0.05), rgba(13, 11, 12, 0.5));
+	}
+
+	.peca-a__poster .play svg,
+	.peca-b__thumb .play svg {
+		width: 42px;
+		height: 42px;
+	}
+
+	.peca-a__strip {
+		background: var(--color-obsidian-soft);
+		padding-block: var(--space-md);
+	}
+
+	.peca-a__strip-list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		gap: var(--space-md);
+		margin: 0;
+	}
+
+	.peca-a__strip-list dt {
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-sand);
+		margin-bottom: 0.3rem;
+	}
+
+	.peca-a__strip-list dd {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--color-pearl-dim);
+		line-height: 1.4;
+	}
+
+	/* ---------- Mobile: Ficha ---------- */
+	.peca-b__thumb {
+		position: relative;
+		display: block;
 		width: 100%;
 		aspect-ratio: 16 / 9;
-		border-radius: 16px;
+		border-radius: 12px;
 		overflow: hidden;
 		border: 1px solid rgba(201, 166, 107, 0.2);
+		margin-bottom: var(--space-md);
+		padding: 0;
+		background: none;
+		font: inherit;
+		cursor: pointer;
 	}
 
-	.peca-video__frame iframe {
+	.peca-b__thumb img,
+	.peca-a__poster-fallback {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.peca-b__meta {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.9rem 1.2rem;
+		margin: 0 0 var(--space-md);
+		padding-top: var(--space-sm);
+		border-top: 1px solid rgba(201, 166, 107, 0.18);
+	}
+
+	.peca-b__meta dt {
+		font-size: 0.68rem;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-sand);
+		margin-bottom: 0.15rem;
+	}
+
+	.peca-b__meta dd {
+		margin: 0;
+		font-size: 0.85rem;
+		color: var(--color-pearl-dim);
+	}
+
+	@media (max-width: 720px) {
+		.peca-a,
+		.peca-a__strip,
+		.peca-video {
+			display: none;
+		}
+
+		.peca-b {
+			display: block;
+		}
+	}
+
+	.peca-outras {
+		padding-top: var(--space-lg);
+	}
+
+	.peca-outras__vazio {
+		color: var(--color-pearl-dim);
+	}
+
+	.peca-outras__vazio a {
+		color: var(--color-crimson-bright);
+		text-decoration: underline;
+	}
+
+	.peca-outras__viewport {
+		position: relative;
+		width: 100%;
+	}
+
+	.peca-outras__track {
+		display: flex;
+		gap: var(--space-md);
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		padding-block: 0.5rem;
+		scrollbar-width: none;
+	}
+
+	.peca-outras__track::-webkit-scrollbar {
+		display: none;
+	}
+
+	.peca-outras__item {
+		flex: 0 0 260px;
+		scroll-snap-align: start;
+	}
+
+	.peca-outras__arrow {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 5;
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		border: 1px solid var(--color-sand);
+		background: var(--color-obsidian-soft);
+		color: var(--color-sand);
+		font-size: 1.1rem;
+		cursor: pointer;
+		transition: background-color 0.3s var(--ease-dramatic), color 0.3s var(--ease-dramatic);
+	}
+
+	.peca-outras__arrow:hover {
+		background: var(--color-sand);
+		color: var(--color-obsidian);
+	}
+
+	.peca-outras__arrow--prev {
+		left: -24px;
+	}
+
+	.peca-outras__arrow--next {
+		right: -24px;
+	}
+
+	@media (max-width: 720px) {
+		.peca-outras__arrow {
+			display: none;
+		}
+	}
+
+	/* ---------- Modal de vídeo ---------- */
+	.video-modal {
+		display: none;
+		position: fixed;
+		inset: 0;
+		z-index: 1000;
+		background: rgba(8, 7, 7, 0.94);
+		align-items: center;
+		justify-content: center;
+		padding: var(--space-md);
+	}
+
+	.video-modal.is-open {
+		display: flex;
+	}
+
+	.video-modal__frame {
+		position: relative;
+		width: min(100%, 1100px);
+		aspect-ratio: 16 / 9;
+	}
+
+	.video-modal__frame iframe,
+	.video-modal__frame video {
 		position: absolute;
 		inset: 0;
 		width: 100%;
 		height: 100%;
 		border: 0;
+		border-radius: 10px;
+		background: #000;
 	}
 
-	.peca-video__nativo {
-		width: 100%;
-		border-radius: 16px;
-		border: 1px solid rgba(201, 166, 107, 0.2);
+	.video-modal__close {
+		position: absolute;
+		top: var(--space-sm);
+		right: var(--space-sm);
+		width: 42px;
+		height: 42px;
+		border-radius: 50%;
+		border: 1px solid rgba(242, 236, 228, 0.3);
+		background: rgba(13, 11, 12, 0.6);
+		color: var(--color-pearl);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		transition: border-color 0.3s var(--ease-dramatic);
 	}
 
-	.peca-roteiro__conteudo {
-		color: var(--color-pearl-dim);
-		max-width: 65ch;
-		line-height: 1.8;
+	.video-modal__close:hover {
+		border-color: var(--color-sand);
 	}
 
-	.peca-roteiro__conteudo :global(p) {
-		margin-bottom: var(--space-sm);
+	.video-modal__close svg {
+		width: 18px;
+		height: 18px;
 	}
 </style>
 
@@ -147,4 +614,88 @@ const embedUrl = peca.data.video ? toYoutubeEmbed(peca.data.video) : null;
 		{ opacity: 0, y: 24 },
 		{ opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out" }
 	);
+
+	const outrasTrack = document.getElementById("outras-track");
+	const outrasPrev = document.getElementById("outras-prev");
+	const outrasNext = document.getElementById("outras-next");
+
+	const scrollOutrasByStep = (dir: number) => {
+		if (!outrasTrack) return;
+		const item = outrasTrack.querySelector(".peca-outras__item");
+		const step = item ? item.clientWidth + 16 : 260;
+		outrasTrack.scrollBy({ left: dir * step, behavior: "smooth" });
+	};
+
+	outrasPrev?.addEventListener("click", () => scrollOutrasByStep(-1));
+	outrasNext?.addEventListener("click", () => scrollOutrasByStep(1));
+
+	const modal = document.getElementById("video-modal");
+	const modalFrame = document.getElementById("video-modal-frame");
+	const closeBtn = document.getElementById("video-modal-close");
+	const isMobile = () => window.matchMedia("(max-width: 720px)").matches;
+
+	function closeModal() {
+		if (!modal || !modalFrame) return;
+		if (document.fullscreenElement) {
+			document.exitFullscreen().catch(() => {});
+		}
+		modal.classList.remove("is-open");
+		modal.setAttribute("aria-hidden", "true");
+		modalFrame.innerHTML = "";
+	}
+
+	function openModal(videoId: string, videoSrc: string) {
+		if (!modal || !modalFrame) return;
+		modalFrame.innerHTML = "";
+
+		const fillStyle = "position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:10px;background:#000;";
+
+		if (videoId) {
+			const iframe = document.createElement("iframe");
+			iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+			iframe.title = "Teaser";
+			iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+			iframe.allowFullscreen = true;
+			iframe.style.cssText = fillStyle;
+			modalFrame.appendChild(iframe);
+		} else if (videoSrc) {
+			const video = document.createElement("video");
+			video.src = videoSrc;
+			video.controls = true;
+			video.autoplay = true;
+			video.style.cssText = fillStyle;
+			modalFrame.appendChild(video);
+		} else {
+			return;
+		}
+
+		modal.classList.add("is-open");
+		modal.setAttribute("aria-hidden", "false");
+
+		if (isMobile() && modalFrame.requestFullscreen) {
+			modalFrame.requestFullscreen().catch(() => {});
+		}
+	}
+
+	document.querySelectorAll("[data-video-trigger]").forEach((el) => {
+		el.addEventListener("click", () => {
+			const videoId = el.getAttribute("data-video-id") ?? "";
+			const videoSrc = el.getAttribute("data-video-src") ?? "";
+			openModal(videoId, videoSrc);
+		});
+	});
+
+	closeBtn?.addEventListener("click", closeModal);
+
+	modal?.addEventListener("click", (e) => {
+		if (e.target === modal) closeModal();
+	});
+
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape") closeModal();
+	});
+
+	document.addEventListener("fullscreenchange", () => {
+		if (!document.fullscreenElement) closeModal();
+	});
 </script>
