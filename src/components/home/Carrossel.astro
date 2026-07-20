@@ -1,38 +1,71 @@
 ---
-const slides = [1, 2, 3, 4, 5];
+// Coloque os arquivos em public/galeria/ e liste os caminhos aqui, ex: "/galeria/01.jpg"
+const fotos: string[] = [
+	"/galeria/1.jpeg",
+	"/galeria/2.jpeg",
+	"/galeria/3.jpeg",
+	"/galeria/4.jpeg",
+	"/galeria/5.jpeg",
+	"/galeria/6.jpeg",
+	"/galeria/7.jpeg",
+	"/galeria/8.jpeg",
+	"/galeria/9.jpeg",
+	"/galeria/10.jpeg",
+];
+
+const slidesPlaceholder = [1, 2, 3, 4, 5];
 ---
 
 <section class="carrossel section" id="galeria">
 	<div class="container carrossel__heading">
-		<p class="eyebrow">Bastidores</p>
-		<h2>Nossos momentos em cena</h2>
-		<p class="carrossel__sub">
-			Em breve, fotos reais do grupo entram aqui. Por enquanto, veja como o carrossel vai se comportar.
-		</p>
+		<div>
+			<p class="eyebrow">Bastidores</p>
+			<h2>Nossos momentos em cena</h2>
+			<p class="carrossel__sub">
+				Em breve, fotos reais do grupo entram aqui. Por enquanto, veja como o carrossel vai se comportar.
+			</p>
+		</div>
+
+		<div class="carrossel__nav">
+			<button type="button" class="carrossel__arrow" id="carrossel-prev" aria-label="Foto anterior">←</button>
+			<button type="button" class="carrossel__arrow" id="carrossel-next" aria-label="Próxima foto">→</button>
+		</div>
 	</div>
 
 	<div class="carrossel__viewport">
 		<div class="carrossel__track" id="carrossel-track">
 			{
-				slides.map((n) => (
-					<figure class="carrossel__slide" style={`--hue: ${n}`}>
-						<span class="carrossel__slide-index">{String(n).padStart(2, "0")}</span>
-						<figcaption>Foto do grupo em breve</figcaption>
-					</figure>
-				))
+				fotos.length > 0
+					? fotos.map((foto) => (
+							<figure class="carrossel__slide carrossel__slide--foto">
+								<img src={foto} alt="Adoração em Cena" loading="lazy" draggable="false" />
+							</figure>
+						))
+					: slidesPlaceholder.map((n) => (
+							<figure class="carrossel__slide" style={`--hue: ${n}`}>
+								<span class="carrossel__slide-index">{String(n).padStart(2, "0")}</span>
+								<figcaption>Foto do grupo em breve</figcaption>
+							</figure>
+						))
 			}
 		</div>
-	</div>
-
-	<div class="container carrossel__controls">
-		<button type="button" id="carrossel-prev" aria-label="Slide anterior">←</button>
-		<button type="button" id="carrossel-next" aria-label="Próximo slide">→</button>
 	</div>
 </section>
 
 <style>
 	.carrossel__heading {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: var(--space-md);
+		flex-wrap: wrap;
 		margin-bottom: var(--space-md);
+	}
+
+	.carrossel__nav {
+		display: flex;
+		gap: 0.75rem;
+		flex-shrink: 0;
 	}
 
 	.carrossel__sub {
@@ -41,6 +74,7 @@ const slides = [1, 2, 3, 4, 5];
 	}
 
 	.carrossel__viewport {
+		position: relative;
 		width: 100%;
 	}
 
@@ -50,8 +84,16 @@ const slides = [1, 2, 3, 4, 5];
 		overflow-x: auto;
 		scroll-snap-type: x mandatory;
 		padding-inline: max(1rem, calc((100vw - var(--container-width)) / 2));
+		scroll-padding-inline: max(1rem, calc((100vw - var(--container-width)) / 2));
 		padding-block: 0.5rem;
 		scrollbar-width: none;
+		cursor: grab;
+		user-select: none;
+	}
+
+	.carrossel__track.is-dragging {
+		cursor: grabbing;
+		scroll-snap-type: none;
 	}
 
 	.carrossel__track::-webkit-scrollbar {
@@ -78,6 +120,17 @@ const slides = [1, 2, 3, 4, 5];
 		overflow: hidden;
 	}
 
+	.carrossel__slide--foto {
+		padding: 0;
+	}
+
+	.carrossel__slide--foto img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
 	.carrossel__slide-index {
 		position: absolute;
 		top: var(--space-sm);
@@ -94,15 +147,9 @@ const slides = [1, 2, 3, 4, 5];
 		text-transform: uppercase;
 	}
 
-	.carrossel__controls {
-		display: flex;
-		gap: var(--space-sm);
-		margin-top: var(--space-md);
-	}
-
-	.carrossel__controls button {
-		width: 48px;
-		height: 48px;
+	.carrossel__arrow {
+		width: 44px;
+		height: 44px;
 		border-radius: 50%;
 		border: 1px solid var(--color-sand);
 		background: transparent;
@@ -112,16 +159,22 @@ const slides = [1, 2, 3, 4, 5];
 		transition: background-color 0.3s var(--ease-dramatic), color 0.3s var(--ease-dramatic);
 	}
 
-	.carrossel__controls button:hover {
+	.carrossel__arrow:hover {
 		background: var(--color-sand);
 		color: var(--color-obsidian);
+	}
+
+	@media (max-width: 600px) {
+		.carrossel__nav {
+			display: none;
+		}
 	}
 </style>
 
 <script>
 	import { gsap } from "../../scripts/gsap-setup";
 
-	const track = document.getElementById("carrossel-track");
+	const track = document.getElementById("carrossel-track") as HTMLElement | null;
 	const prev = document.getElementById("carrossel-prev");
 	const next = document.getElementById("carrossel-next");
 
@@ -129,11 +182,47 @@ const slides = [1, 2, 3, 4, 5];
 		if (!track) return;
 		const slide = track.querySelector(".carrossel__slide");
 		const step = slide ? slide.clientWidth + 16 : 300;
-		track.scrollBy({ left: dir * step, behavior: "smooth" });
+		const maxScroll = track.scrollWidth - track.clientWidth;
+
+		if (dir > 0 && track.scrollLeft >= maxScroll - 4) {
+			track.scrollTo({ left: 0, behavior: "smooth" });
+		} else if (dir < 0 && track.scrollLeft <= 4) {
+			track.scrollTo({ left: maxScroll, behavior: "smooth" });
+		} else {
+			track.scrollBy({ left: dir * step, behavior: "smooth" });
+		}
 	};
 
 	prev?.addEventListener("click", () => scrollByStep(-1));
 	next?.addEventListener("click", () => scrollByStep(1));
+
+	if (track) {
+		let isDragging = false;
+		let startX = 0;
+		let startScroll = 0;
+
+		track.addEventListener("pointerdown", (e) => {
+			if (e.pointerType !== "mouse") return;
+			isDragging = true;
+			startX = e.clientX;
+			startScroll = track.scrollLeft;
+			track.classList.add("is-dragging");
+			track.setPointerCapture(e.pointerId);
+		});
+
+		track.addEventListener("pointermove", (e) => {
+			if (!isDragging) return;
+			track.scrollLeft = startScroll - (e.clientX - startX);
+		});
+
+		const endDrag = () => {
+			isDragging = false;
+			track.classList.remove("is-dragging");
+		};
+
+		track.addEventListener("pointerup", endDrag);
+		track.addEventListener("pointercancel", endDrag);
+	}
 
 	gsap.fromTo(
 		".carrossel__slide",
