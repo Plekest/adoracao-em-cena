@@ -1,17 +1,28 @@
 ---
+const pilares = [
+	{
+		titulo: "Missão",
+		texto:
+			"Mostrar o amor e a mensagem transformadora de Jesus Cristo por meio das artes cênicas, unindo teatro, dança, música e expressão corporal para tocar corações, despertar esperança e conduzir pessoas a uma experiência com Deus.",
+	},
+	{
+		titulo: "Visão",
+		texto:
+			"Ser um ministério de referência na evangelização através das artes, formando adoradores comprometidos com Cristo e impactando vidas em igrejas, teatros, escolas, praças e onde Deus nos enviar, levando o Evangelho com excelência, sensibilidade e amor.",
+	},
+];
+
 const valores = [
-	{
-		titulo: "Fé em cena",
-		texto: "Cada peça nasce de um propósito: comunicar mensagens de fé através da linguagem do teatro.",
-	},
-	{
-		titulo: "Arte com excelência",
-		texto: "Figurino, cenário, trilha e atuação são construídos com cuidado para entregar uma experiência completa.",
-	},
-	{
-		titulo: "Comunidade viva",
-		texto: "Somos um grupo que cresce junto - ensaiando, criando e se apresentando como uma família.",
-	},
+	"Cristo, como o centro de tudo.",
+	"Adoração acima da performance.",
+	"Excelência em cada apresentação.",
+	"Unidade e amor entre os integrantes.",
+	"Santidade e testemunho de vida.",
+	"Serviço com humildade.",
+	"Criatividade inspirada pelo Espírito Santo.",
+	"Compromisso com a verdade do Evangelho.",
+	"Disciplina e dedicação.",
+	"Transformação de vidas como maior propósito, começando pelas nossas.",
 ];
 ---
 
@@ -21,21 +32,44 @@ const valores = [
 			<p class="eyebrow">Quem somos</p>
 			<h2>Adoração em Cena</h2>
 			<p class="sobre__texto">
-				Somos um grupo de drama que transforma fé em movimento, palavra e expressão. No palco, contamos
-				histórias que tocam o coração e apontam para algo maior - usando teatro, dança e arte cênica como
-				ponte entre a mensagem e quem assiste.
+				Há 16 anos nasceu um sonho: transformar a arte em um instrumento de adoração. Desde então, o
+				Adoração em Cena tem levado o Evangelho através de histórias que emocionam, desafiam e aproximam
+				pessoas de Deus.
+			</p>
+			<p class="sobre__texto">
+				Ao longo dessa caminhada, já apresentamos para multidões e para pequenos grupos. Em igrejas,
+				teatros, praças e ruas, aprendemos que não importa o tamanho do público; cada pessoa alcançada tem
+				valor eterno.
+			</p>
+			<p class="sobre__texto">
+				Cada ensaio, cada figurino, cada coreografia e cada cena têm um único propósito: glorificar a Deus e
+				anunciar Sua Palavra. Somos jovens e adolescentes que decidiram usar seus dons como instrumento de
+				esperança, acreditando que a arte pode abrir portas onde, muitas vezes, apenas palavras não
+				conseguem chegar.
 			</p>
 		</div>
 
 		<div class="sobre__valores">
 			{
-				valores.map((valor) => (
-					<article class="valor-card reveal">
-						<h3>{valor.titulo}</h3>
-						<p>{valor.texto}</p>
-					</article>
+				pilares.map((pilar) => (
+					<details class="pilar-accordion reveal">
+						<summary>
+							<span>{pilar.titulo}</span>
+							<svg class="chevron" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+								<path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</summary>
+						<p>{pilar.texto}</p>
+					</details>
 				))
 			}
+
+			<article class="valor-card reveal">
+				<h3>Valores</h3>
+				<ul class="valores-lista">
+					{valores.map((valor) => <li>{valor}</li>)}
+				</ul>
+			</article>
 		</div>
 	</div>
 </section>
@@ -44,6 +78,14 @@ const valores = [
 	.sobre__grid {
 		display: grid;
 		gap: var(--space-lg);
+	}
+
+	@media (min-width: 900px) {
+		.sobre__grid {
+			grid-template-columns: 1fr 1.15fr;
+			align-items: center;
+			gap: var(--space-xl);
+		}
 	}
 
 	.sobre__intro {
@@ -57,8 +99,7 @@ const valores = [
 
 	.sobre__valores {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-		gap: var(--space-md);
+		gap: var(--space-sm);
 	}
 
 	.valor-card {
@@ -68,15 +109,75 @@ const valores = [
 		background: linear-gradient(180deg, rgba(201, 166, 107, 0.05), transparent);
 	}
 
+	.pilar-accordion {
+		padding: 0.7rem 1.1rem;
+		border: 1px solid rgba(201, 166, 107, 0.18);
+		border-radius: 10px;
+		background: linear-gradient(180deg, rgba(201, 166, 107, 0.05), transparent);
+	}
+
 	.valor-card h3 {
 		font-size: 1.15rem;
 		margin-bottom: 0.5rem;
 	}
 
-	.valor-card p {
+	.pilar-accordion summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-sm);
+		cursor: pointer;
+		font-size: 1rem;
+		font-weight: 600;
+		list-style: none;
+		color: var(--color-sand);
+	}
+
+	.pilar-accordion summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.pilar-accordion .chevron {
+		width: 16px;
+		height: 16px;
+		flex-shrink: 0;
+		color: var(--color-sand);
+		transition: transform 0.3s var(--ease-dramatic);
+	}
+
+	.pilar-accordion[open] .chevron {
+		transform: rotate(180deg);
+	}
+
+	.pilar-accordion p {
+		margin: 0.5rem 0 0;
 		color: var(--color-pearl-dim);
-		font-size: 0.95rem;
+		font-size: 0.9rem;
+	}
+
+	.valores-lista {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: 0.5rem 1.5rem;
 		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.valores-lista li {
+		color: var(--color-pearl-dim);
+		font-size: 0.9rem;
+		padding-left: 1.1rem;
+		position: relative;
+	}
+
+	.valores-lista li::before {
+		content: "✦";
+		position: absolute;
+		left: 0;
+		color: var(--color-sand);
+		font-size: 0.7rem;
+		top: 0.25rem;
 	}
 </style>
 
