@@ -4,7 +4,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import PecaCard from "../components/portfolio/PecaCard.astro";
 import { pecaDesbloqueada } from "../lib/portfolio";
 
-const pecas = (await getCollection("portfolio")).sort((a, b) => {
+const pecas = (await getCollection("portfolio", (p) => p.id !== "juju-e-leleco")).sort((a, b) => {
 	if (a.id === "power-of-love") return -1;
 	if (b.id === "power-of-love") return 1;
 	const dataA = a.data.data ? new Date(a.data.data).getTime() : 0;

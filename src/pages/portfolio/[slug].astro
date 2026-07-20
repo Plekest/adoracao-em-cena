@@ -16,7 +16,9 @@ export async function getStaticPaths() {
 
 const { peca } = Astro.props;
 
-const outras = (await getCollection("portfolio")).filter((p) => p.id !== peca.id);
+const outras = (await getCollection("portfolio")).filter(
+	(p) => p.id !== peca.id && p.id !== "juju-e-leleco"
+);
 
 function getYoutubeId(url: string): string | null {
 	const watch = url.match(/[?&]v=([^&]+)/);
@@ -28,6 +30,10 @@ function getYoutubeId(url: string): string | null {
 
 const videoId = peca.data.video ? getYoutubeId(peca.data.video) : null;
 const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+
+const videosExtras = peca.data.videos
+	.map((url) => ({ url, id: getYoutubeId(url) }))
+	.filter((v): v is { url: string; id: string } => Boolean(v.id));
 const temFicha = Boolean(
 	peca.data.diretor || peca.data.dramaturgo || (peca.data.atores && peca.data.atores.length > 0)
 );
@@ -209,6 +215,35 @@ const temFicha = Boolean(
 				<div class="container">
 					<h2>Galeria</h2>
 					<Galeria fotos={peca.data.fotos} titulo={peca.data.titulo} />
+				</div>
+			</section>
+		)
+	}
+
+	{
+		videosExtras.length > 0 && (
+			<section class="section">
+				<div class="container">
+					<h2>Mais vídeos</h2>
+					<div class="videos-extras">
+						{videosExtras.map((v) => (
+							<button
+								type="button"
+								class="videos-extras__item"
+								data-video-trigger
+								data-video-id={v.id}
+								aria-label={`Assistir vídeo de ${peca.data.titulo}`}
+							>
+								<img src={`https://img.youtube.com/vi/${v.id}/hqdefault.jpg`} alt="" loading="lazy" />
+								<span class="play">
+									<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<circle cx="12" cy="12" r="11" fill="rgba(13,11,12,0.55)" stroke="#f2ece4" stroke-opacity="0.6" />
+										<path d="M10 8.5L16 12L10 15.5V8.5Z" fill="#f2ece4" />
+									</svg>
+								</span>
+							</button>
+						))}
+					</div>
 				</div>
 			</section>
 		)
@@ -473,6 +508,51 @@ const temFicha = Boolean(
 		.peca-b {
 			display: block;
 		}
+	}
+
+	.videos-extras {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: var(--space-md);
+	}
+
+	.videos-extras__item {
+		position: relative;
+		display: block;
+		aspect-ratio: 16 / 9;
+		border-radius: 10px;
+		overflow: hidden;
+		border: 1px solid rgba(201, 166, 107, 0.2);
+		padding: 0;
+		background: none;
+		font: inherit;
+		cursor: pointer;
+	}
+
+	.videos-extras__item img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.videos-extras__item .play {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: linear-gradient(180deg, rgba(13, 11, 12, 0.1), rgba(13, 11, 12, 0.65));
+		transition: background 0.3s var(--ease-dramatic);
+	}
+
+	.videos-extras__item:hover .play {
+		background: linear-gradient(180deg, rgba(13, 11, 12, 0.05), rgba(13, 11, 12, 0.5));
+	}
+
+	.videos-extras__item .play svg {
+		width: 42px;
+		height: 42px;
 	}
 
 	.peca-outras {

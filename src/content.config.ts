@@ -15,6 +15,7 @@ const portfolio = defineCollection({
 		duracao: z.string().optional(),
 		fotos: z.array(z.string()).default([]),
 		video: z.string().url().optional(),
+		videos: z.array(z.string().url()).default([]),
 		data: z.coerce.date().optional(),
 	}),
 });

@@ -1,3 +1,5 @@
+const desbloqueadas = ["power-of-love", "juju-e-leleco"];
+
 export function pecaDesbloqueada(id: string): boolean {
-	return id === "power-of-love";
+	return desbloqueadas.includes(id);
 }
