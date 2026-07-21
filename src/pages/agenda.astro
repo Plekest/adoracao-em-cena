@@ -1,0 +1,178 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const LOCAL = "Entre Comunidade";
+const ENDERECO = "Taguatinga Centro";
+const MAPS_URL = "https://maps.app.goo.gl/1yApDrqtT8J7ZGtv7";
+
+const diasSemana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+const meses = [
+	"janeiro", "fevereiro", "março", "abril", "maio", "junho",
+	"julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
+];
+
+function formatarData(data: Date) {
+	return `${diasSemana[data.getDay()]}, ${data.getDate()} de ${meses[data.getMonth()]}`;
+}
+
+// Todo sábado, às 10h, até o fim do ano - a partir do próximo sábado
+const eventos: { data: string; hora: string; local: string; endereco: string; mapsUrl: string }[] = [];
+const hoje = new Date();
+const cursor = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+while (cursor.getDay() !== 6) {
+	cursor.setDate(cursor.getDate() + 1);
+}
+const fimDoAno = new Date(hoje.getFullYear(), 11, 31);
+while (cursor <= fimDoAno) {
+	eventos.push({
+		data: formatarData(cursor),
+		hora: "10:00h",
+		local: LOCAL,
+		endereco: ENDERECO,
+		mapsUrl: MAPS_URL,
+	});
+	cursor.setDate(cursor.getDate() + 7);
+}
+---
+
+<BaseLayout
+	title="Agenda - Adoração em Cena"
+	description="Confira as próximas apresentações do Adoração em Cena, todo sábado às 10h na Entre Comunidade, Taguatinga Centro."
+>
+	<section class="agenda-hero section">
+		<div class="container">
+			<p class="eyebrow reveal">Onde estaremos</p>
+			<h1 class="reveal">Agenda</h1>
+			<p class="agenda-hero__intro reveal">
+				Acompanhe nosso passo a passo e saiba onde estaremos apresentando em cada data.
+			</p>
+		</div>
+	</section>
+
+	<section class="section agenda-timeline-section">
+		<div class="container">
+			<ol class="timeline">
+				{
+					eventos.map((evento) => (
+						<li class="timeline__item reveal">
+							<span class="timeline__marker" aria-hidden="true" />
+							<div class="timeline__card">
+								<p class="timeline__data">{evento.data}</p>
+								<p class="timeline__hora">{evento.hora}</p>
+								<a
+									class="timeline__local"
+									href={evento.mapsUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{evento.local} - {evento.endereco}
+								</a>
+							</div>
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.agenda-hero {
+		padding-bottom: var(--space-md);
+		text-align: center;
+	}
+
+	.agenda-hero__intro {
+		color: var(--color-pearl-dim);
+		max-width: 55ch;
+		margin-inline: auto;
+	}
+
+	.agenda-timeline-section {
+		padding-top: 0;
+	}
+
+	.timeline {
+		position: relative;
+		max-width: 40rem;
+		margin-inline: auto;
+		list-style: none;
+		padding-left: var(--space-md);
+	}
+
+	.timeline::before {
+		content: "";
+		position: absolute;
+		left: 5px;
+		top: 0.5rem;
+		bottom: 0.5rem;
+		width: 1px;
+		background: linear-gradient(180deg, var(--color-sand), rgba(201, 166, 107, 0.15));
+	}
+
+	.timeline__item {
+		position: relative;
+		padding-block: var(--space-sm);
+	}
+
+	.timeline__marker {
+		position: absolute;
+		left: calc(-1 * var(--space-md) + 1px);
+		top: 1.6rem;
+		width: 11px;
+		height: 11px;
+		border-radius: 50%;
+		background: var(--color-obsidian);
+		border: 2px solid var(--color-sand);
+	}
+
+	.timeline__card {
+		padding: var(--space-sm) var(--space-md);
+		border: 1px solid rgba(201, 166, 107, 0.2);
+		border-radius: 16px;
+		background: linear-gradient(180deg, rgba(201, 166, 107, 0.05), transparent);
+		transition: transform 0.35s var(--ease-dramatic), border-color 0.35s var(--ease-dramatic);
+	}
+
+	.timeline__card:hover {
+		transform: translateX(4px);
+		border-color: var(--color-sand);
+	}
+
+	.timeline__data {
+		font-family: var(--font-display);
+		font-size: 1.15rem;
+		margin: 0;
+		text-transform: capitalize;
+	}
+
+	.timeline__hora {
+		color: var(--color-sand);
+		font-size: 0.85rem;
+		letter-spacing: 0.05em;
+		margin: 0.15rem 0 0.5rem;
+	}
+
+	.timeline__local {
+		display: inline-block;
+		color: var(--color-pearl-dim);
+		font-size: 0.9rem;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+		transition: color 0.3s var(--ease-dramatic);
+	}
+
+	.timeline__local:hover {
+		color: var(--color-crimson-bright);
+	}
+</style>
+
+<script>
+	import { gsap } from "../scripts/gsap-setup";
+
+	gsap.fromTo(
+		".reveal",
+		{ opacity: 0, y: 24 },
+		{ opacity: 1, y: 0, duration: 0.8, stagger: 0.05, ease: "power3.out" }
+	);
+</script>

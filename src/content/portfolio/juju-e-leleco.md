@@ -7,7 +7,11 @@ atores:
   - "Equipe Adoração em Cena"
 video: "https://www.youtube.com/watch?v=uaf4i8QH1WQ"
 fotos: []
-videos: []
+videos:
+  - "https://www.youtube.com/watch?v=N7QHRjr2isI"
+  - "https://www.youtube.com/watch?v=RK6zi86G-u0"
+  - "https://www.youtube.com/watch?v=UFXamJWWd4M"
+  - "https://www.youtube.com/watch?v=hYvvGYqy-UU"
 ---
 
 Roteiro completo em breve.

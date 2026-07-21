@@ -1,6 +1,9 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 
+// TODO: trocar pelo e-mail real do grupo
+const EMAIL_DESTINO = "contato@adoracaoemcena.com.br";
+
 const canais = [
 	{
 		nome: "WhatsApp",
@@ -11,15 +14,20 @@ const canais = [
 	},
 	{
 		nome: "Instagram",
-		valor: "@t7adoracaoemcena",
-		href: "https://www.instagram.com/t7adoracaoemcena/",
+		valor: "@adoracaoemcena",
+		href: "https://www.instagram.com/adoracaoemcena/",
 		icone: "📷",
 	},
 	{
+		nome: "YouTube",
+		valor: "@adoracao-em-cena",
+		href: "https://www.youtube.com/@adoracao-em-cena",
+		icone: "▶️",
+	},
+	{
 		nome: "E-mail",
-		valor: "contato@adoracaoemcena.com.br",
-		// TODO: trocar pelo e-mail real do grupo
-		href: "mailto:contato@adoracaoemcena.com.br",
+		valor: EMAIL_DESTINO,
+		href: `mailto:${EMAIL_DESTINO}`,
 		icone: "✉️",
 	},
 ];
@@ -34,6 +42,24 @@ const canais = [
 				Dúvidas, convites para apresentações ou só quer bater um papo sobre o grupo? Escolha o canal que
 				preferir.
 			</p>
+
+			<form class="contato-form reveal" id="contato-form">
+				<div class="contato-form__row">
+					<label for="contato-nome">Nome</label>
+					<input type="text" id="contato-nome" name="nome" required />
+				</div>
+				<div class="contato-form__row">
+					<label for="contato-email">Seu e-mail</label>
+					<input type="email" id="contato-email" name="email" required />
+				</div>
+				<div class="contato-form__row">
+					<label for="contato-mensagem">Mensagem</label>
+					<textarea id="contato-mensagem" name="mensagem" rows="5" required></textarea>
+				</div>
+				<button type="submit" class="btn btn-solid">Enviar mensagem</button>
+			</form>
+
+			<p class="contato__divisor reveal">ou escolha um canal</p>
 
 			<div class="contato__grid">
 				{
@@ -74,12 +100,65 @@ const canais = [
 		margin-inline: auto;
 	}
 
+	.contato-form {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-md);
+		max-width: 32rem;
+		margin: var(--space-lg) auto 0;
+		text-align: left;
+	}
+
+	.contato-form__row {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+
+	.contato-form__row label {
+		font-size: 0.8rem;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		color: var(--color-sand);
+	}
+
+	.contato-form__row input,
+	.contato-form__row textarea {
+		font-family: var(--font-body);
+		font-size: 1rem;
+		color: var(--color-pearl);
+		background: var(--color-obsidian-soft);
+		border: 1px solid rgba(201, 166, 107, 0.25);
+		border-radius: 10px;
+		padding: 0.75rem 1rem;
+		resize: vertical;
+		transition: border-color 0.3s var(--ease-dramatic);
+	}
+
+	.contato-form__row input:focus,
+	.contato-form__row textarea:focus {
+		outline: none;
+		border-color: var(--color-sand);
+	}
+
+	.contato-form .btn {
+		align-self: center;
+	}
+
+	.contato__divisor {
+		color: var(--color-pearl-dim);
+		font-size: 0.85rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		margin-top: var(--space-lg);
+	}
+
 	.contato__grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 		gap: var(--space-md);
 		margin-top: var(--space-lg);
-		max-width: 50rem;
+		max-width: 60rem;
 		margin-inline: auto;
 	}
 
@@ -123,4 +202,20 @@ const canais = [
 		{ opacity: 0, y: 24 },
 		{ opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out" }
 	);
+
+	const form = document.getElementById("contato-form") as HTMLFormElement | null;
+
+	form?.addEventListener("submit", (e) => {
+		e.preventDefault();
+
+		const nome = (document.getElementById("contato-nome") as HTMLInputElement).value;
+		const email = (document.getElementById("contato-email") as HTMLInputElement).value;
+		const mensagem = (document.getElementById("contato-mensagem") as HTMLTextAreaElement).value;
+
+		const assunto = encodeURIComponent(`Contato pelo site - ${nome}`);
+		const corpo = encodeURIComponent(`Nome: ${nome}\nE-mail: ${email}\n\n${mensagem}`);
+
+		// TODO: trocar pelo e-mail real do grupo (mesmo endereço usado no card de e-mail acima)
+		window.location.href = `mailto:contato@adoracaoemcena.com.br?subject=${assunto}&body=${corpo}`;
+	});
 </script>

@@ -3,10 +3,19 @@ const links = [
 	{ href: "/", label: "Início" },
 	{ href: "/portfolio", label: "Portfólio" },
 	{ href: "/portfolio/juju-e-leleco", label: "Juju & Leleco" },
+	{ href: "/agenda", label: "Agenda" },
 	{ href: "/integrantes", label: "Integrantes" },
 	{ href: "/contato", label: "Contato" },
 ];
 const currentPath = Astro.url.pathname;
+
+const whatsappMensagem = encodeURIComponent(
+	"Olá! Vim pelo site do Adoração em Cena e gostaria de saber mais sobre o grupo."
+);
+// TODO: trocar pelo número real do grupo, formato só dígitos com DDI (ex: 5511999999999)
+const whatsappUrl = `https://wa.me/5511999999999?text=${whatsappMensagem}`;
+const instagramUrl = "https://www.instagram.com/adoracaoemcena/";
+const youtubeUrl = "https://www.youtube.com/@adoracao-em-cena";
 ---
 
 <header class="nav" id="site-nav">
@@ -32,14 +41,26 @@ const currentPath = Astro.url.pathname;
 					</a>
 				))
 			}
-			<a
-				href="https://www.instagram.com/t7adoracaoemcena/"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="nav__link nav__link--insta"
-			>
-				Instagram
-			</a>
+			<div class="nav__socials">
+				<a href={instagramUrl} target="_blank" rel="noopener noreferrer" class="nav__social" aria-label="Instagram">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+						<rect x="3" y="3" width="18" height="18" rx="5" />
+						<circle cx="12" cy="12" r="4.2" />
+						<circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none" />
+					</svg>
+				</a>
+				<a href={youtubeUrl} target="_blank" rel="noopener noreferrer" class="nav__social" aria-label="YouTube">
+					<svg viewBox="0 0 24 24" fill="currentColor">
+						<path d="M22 12c0-2.2-.2-3.8-.5-4.9-.3-1-1-1.7-2-2C17.7 4.6 12 4.6 12 4.6s-5.7 0-7.5.5c-1 .3-1.7 1-2 2C2.2 8.2 2 9.8 2 12s.2 3.8.5 4.9c.3 1 1 1.7 2 2 1.8.5 7.5.5 7.5.5s5.7 0 7.5-.5c1-.3 1.7-1 2-2 .3-1.1.5-2.7.5-4.9z" />
+						<path d="M10 15.5v-7L15.5 12 10 15.5z" fill="var(--color-obsidian)" />
+					</svg>
+				</a>
+				<a href={whatsappUrl} target="_blank" rel="noopener noreferrer" class="nav__social" aria-label="WhatsApp">
+					<svg viewBox="0 0 24 24" fill="currentColor">
+						<path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.38 1.26 4.8L2 22l5.42-1.36a9.9 9.9 0 0 0 4.62 1.14h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.03c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.11.11-1.79-.11-.41-.13-.94-.3-1.62-.6-2.85-1.23-4.7-4.1-4.84-4.29-.14-.19-1.16-1.54-1.16-2.94 0-1.4.73-2.09.99-2.38.26-.28.57-.35.76-.35h.55c.18 0 .42-.02.65.5.24.53.82 1.86.9 1.99.07.13.12.28.02.46-.09.18-.14.29-.28.45-.14.16-.29.36-.42.48-.14.13-.28.28-.13.55.16.28.7 1.16 1.5 1.87 1.03.92 1.9 1.21 2.17 1.35.28.14.44.12.6-.07.16-.19.68-.79.87-1.06.18-.28.37-.23.61-.14.25.09 1.57.74 1.84.87.27.14.45.2.51.32.07.11.07.65-.17 1.33z" />
+					</svg>
+				</a>
+			</div>
 		</nav>
 	</div>
 </header>
@@ -127,8 +148,25 @@ const currentPath = Astro.url.pathname;
 		color: var(--color-sand);
 	}
 
-	.nav__link--insta {
-		color: var(--color-crimson-bright);
+	.nav__socials {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
+	}
+
+	.nav__social {
+		display: flex;
+		color: var(--color-pearl);
+		transition: color 0.3s var(--ease-dramatic);
+	}
+
+	.nav__social:hover {
+		color: var(--color-sand);
+	}
+
+	.nav__social svg {
+		width: 20px;
+		height: 20px;
 	}
 
 	@media (max-width: 720px) {
