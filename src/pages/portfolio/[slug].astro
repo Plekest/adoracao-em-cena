@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Galeria from "../../components/portfolio/Galeria.astro";
 import GeneroTag from "../../components/portfolio/GeneroTag.astro";
+import JujuHero from "../../components/portfolio/JujuHero.astro";
 import PecaCard from "../../components/portfolio/PecaCard.astro";
 import { pecaDesbloqueada } from "../../lib/portfolio";
 
@@ -15,6 +16,8 @@ export async function getStaticPaths() {
 }
 
 const { peca } = Astro.props;
+
+const isJuju = peca.id === "juju-e-leleco";
 
 const outras = (await getCollection("portfolio")).filter(
 	(p) => p.id !== peca.id && p.id !== "juju-e-leleco"
@@ -43,6 +46,10 @@ const temFicha = Boolean(
 	title={`${peca.data.titulo} - Portfólio - Adoração em Cena`}
 	description={peca.data.descricao}
 >
+	{isJuju && <JujuHero peca={peca} videoId={videoId} videosExtras={videosExtras} />}
+
+	{!isJuju && (
+	<>
 	<!-- ===== DESKTOP: layout Cartaz ===== -->
 	<section class="peca-a section">
 		<div class="container">
@@ -248,6 +255,8 @@ const temFicha = Boolean(
 			</section>
 		)
 	}
+	</>
+	)}
 
 	<section class="section peca-outras">
 		<div class="container">
