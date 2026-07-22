@@ -1,6 +1,6 @@
 ---
 titulo: "Power of Love"
-descricao: "Apresentada na Vigília Jovem Todo o Poder - X Edição (2017). Fotos e descrição completa em breve."
+descricao: "Um drama sobre o peso do pecado e a libertação que só Jesus pode dar."
 sinopse: "Um drama coreografado que revela o peso do pecado sobre as pessoas - e a libertação que Jesus oferece. Em um clímax de muita entrega física, a peça termina com a crucificação retratada de forma intensa e dançante."
 classificacao: "12 anos"
 diretor: "Abia Lima"

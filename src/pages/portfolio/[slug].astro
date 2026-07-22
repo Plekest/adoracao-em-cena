@@ -268,7 +268,7 @@ const temFicha = Boolean(
 							←
 						</button>
 						<div class="peca-outras__track" id="outras-track">
-							{outras.slice(0, 6).map((p) => (
+							{outras.map((p) => (
 								<div class="peca-outras__item">
 									<PecaCard peca={p} desbloqueada={pecaDesbloqueada(p.id)} />
 								</div>
@@ -707,6 +707,15 @@ const temFicha = Boolean(
 	const outrasTrack = document.getElementById("outras-track");
 	const outrasPrev = document.getElementById("outras-prev");
 	const outrasNext = document.getElementById("outras-next");
+
+	if (outrasTrack) {
+		const itens = Array.from(outrasTrack.children);
+		for (let i = itens.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[itens[i], itens[j]] = [itens[j], itens[i]];
+		}
+		itens.forEach((item) => outrasTrack.appendChild(item));
+	}
 
 	const scrollOutrasByStep = (dir: number) => {
 		if (!outrasTrack) return;

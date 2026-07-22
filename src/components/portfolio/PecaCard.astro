@@ -1,5 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { duracaoConcisa, duracaoParaSegundos } from "../../lib/portfolio";
+import { generos } from "../../lib/generos";
 
 interface Props {
 	peca: CollectionEntry<"portfolio">;
@@ -7,25 +9,52 @@ interface Props {
 }
 
 const { peca, desbloqueada } = Astro.props;
+
+const duracaoCurta = duracaoConcisa(peca.data.duracao);
+const duracaoSegundos = duracaoParaSegundos(peca.data.duracao);
+const capa = peca.data.fotos[0];
+const inicial = peca.data.titulo.trim().charAt(0).toUpperCase();
+const glow = (peca.data.genero && generos[peca.data.genero]?.corGlow) || "rgba(201, 166, 107, 0.2)";
 ---
 
 {
 	desbloqueada ? (
-		<a href={`/portfolio/${peca.id}`} class="peca-card">
-			{peca.data.fotos[0] && <img src={peca.data.fotos[0]} alt={peca.data.titulo} loading="lazy" />}
-			<div class="peca-card__body">
+		<a
+			href={`/portfolio/${peca.id}`}
+			class="peca-card"
+			data-titulo={peca.data.titulo}
+			data-genero={peca.data.genero ?? ""}
+			data-duracao={duracaoSegundos ?? ""}
+			style={`--glow: ${glow}`}
+		>
+			<div class="peca-card__arte" data-letra={inicial} style={capa && `background-image: url(${capa})`} />
+			<div class="peca-card__scrim" />
+			<div class="peca-card__topo">
+				{peca.data.genero && <span class="peca-card__pill">{peca.data.genero}</span>}
+				{duracaoCurta && <span class="peca-card__pill peca-card__pill--duracao">{duracaoCurta}</span>}
+			</div>
+			<div class="peca-card__base">
 				<h3>{peca.data.titulo}</h3>
-				<p>{peca.data.descricao}</p>
+				<p class="peca-card__desc">{peca.data.descricao}</p>
 				<span class="peca-card__link">Ver detalhes →</span>
 			</div>
 		</a>
 	) : (
-		<div class="peca-card peca-card--bloqueada" aria-disabled="true">
-			{peca.data.fotos[0] && <img src={peca.data.fotos[0]} alt={peca.data.titulo} loading="lazy" />}
-			<div class="peca-card__body">
+		<div
+			class="peca-card peca-card--bloqueada"
+			aria-disabled="true"
+			data-titulo={peca.data.titulo}
+			data-genero={peca.data.genero ?? ""}
+			data-duracao={duracaoSegundos ?? ""}
+		>
+			<div class="peca-card__arte" data-letra={inicial} style={capa && `background-image: url(${capa})`} />
+			<div class="peca-card__scrim" />
+			<div class="peca-card__topo">
+				<span class="peca-card__pill">Em breve</span>
+			</div>
+			<div class="peca-card__base">
 				<h3>{peca.data.titulo}</h3>
-				<p>{peca.data.descricao}</p>
-				<span class="peca-card__badge">Em breve</span>
+				<p class="peca-card__desc">{peca.data.descricao}</p>
 			</div>
 		</div>
 	)
@@ -33,16 +62,19 @@ const { peca, desbloqueada } = Astro.props;
 
 <style>
 	.peca-card {
+		position: relative;
 		display: block;
-		border: 1px solid rgba(201, 166, 107, 0.2);
-		border-radius: 16px;
+		aspect-ratio: 4 / 5;
+		border-radius: 8px;
 		overflow: hidden;
-		background: var(--color-obsidian-soft);
-		transition: transform 0.35s var(--ease-dramatic), border-color 0.35s var(--ease-dramatic);
+		border: 1px solid rgba(201, 166, 107, 0.25);
+		box-shadow: 0 25px 45px -25px rgba(0, 0, 0, 0.7);
+		isolation: isolate;
+		transition: transform 0.4s var(--ease-dramatic), border-color 0.4s var(--ease-dramatic);
 	}
 
 	.peca-card:hover {
-		transform: translateY(-4px);
+		transform: translateY(-6px);
 		border-color: var(--color-sand);
 	}
 
@@ -52,49 +84,97 @@ const { peca, desbloqueada } = Astro.props;
 
 	.peca-card--bloqueada:hover {
 		transform: none;
-		border-color: rgba(201, 166, 107, 0.2);
+		border-color: rgba(201, 166, 107, 0.25);
 	}
 
-	.peca-card--bloqueada img {
+	.peca-card--bloqueada .peca-card__arte {
 		filter: grayscale(0.6);
-		opacity: 0.6;
+		opacity: 0.7;
 	}
 
-	.peca-card img {
-		width: 100%;
-		aspect-ratio: 4 / 3;
-		object-fit: cover;
+	.peca-card__arte {
+		position: absolute;
+		inset: 0;
+		background-size: cover;
+		background-position: center;
+		background-color: var(--color-obsidian-soft);
+		background-image: radial-gradient(ellipse 90% 55% at 50% 12%, var(--glow, rgba(201, 166, 107, 0.24)), transparent 65%),
+			linear-gradient(180deg, var(--color-obsidian-soft) 0%, var(--color-obsidian) 100%);
 	}
 
-	.peca-card__body {
-		padding: var(--space-md);
+	.peca-card__arte::before {
+		content: attr(data-letra);
+		position: absolute;
+		right: -0.3rem;
+		top: -1.1rem;
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: 7rem;
+		color: var(--color-pearl);
+		opacity: 0.06;
+		line-height: 1;
 	}
 
-	.peca-card__body h3 {
-		font-size: 1.2rem;
+	.peca-card__scrim {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, transparent 40%, rgba(13, 11, 12, 0.88) 100%);
 	}
 
-	.peca-card__body p {
+	.peca-card__topo {
+		position: absolute;
+		top: 0.7rem;
+		left: 0.7rem;
+		right: 0.7rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 0.4rem;
+		z-index: 2;
+	}
+
+	.peca-card__pill {
+		background: rgba(13, 11, 12, 0.55);
+		border: 1px solid rgba(242, 236, 228, 0.35);
+		color: var(--color-pearl);
+		padding: 0.15rem 0.5rem;
+		border-radius: 999px;
+		font-size: 0.68rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	.peca-card__pill--duracao {
+		font-variant-numeric: tabular-nums;
+	}
+
+	.peca-card__base {
+		position: absolute;
+		left: 0.9rem;
+		right: 0.9rem;
+		bottom: 0.85rem;
+		z-index: 2;
+	}
+
+	.peca-card__base h3 {
+		margin: 0 0 0.4rem;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 1.1rem;
+		color: var(--color-pearl);
+		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+	}
+
+	.peca-card__desc {
+		margin: 0 0 0.6rem;
 		color: var(--color-pearl-dim);
-		font-size: 0.95rem;
+		font-size: 0.82rem;
+		line-height: 1.45;
 	}
 
 	.peca-card__link {
 		display: inline-block;
-		margin-top: 0.5rem;
 		color: var(--color-sand);
-		font-size: 0.85rem;
-	}
-
-	.peca-card__badge {
-		display: inline-block;
-		margin-top: 0.5rem;
-		padding: 0.2rem 0.6rem;
-		border: 1px solid rgba(201, 166, 107, 0.3);
-		border-radius: 999px;
-		color: var(--color-pearl-dim);
-		font-size: 0.75rem;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		font-size: 0.8rem;
 	}
 </style>

@@ -2,15 +2,23 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PecaCard from "../components/portfolio/PecaCard.astro";
+import GenerosLegenda from "../components/portfolio/GenerosLegenda.astro";
 import { pecaDesbloqueada } from "../lib/portfolio";
 
 const pecas = (await getCollection("portfolio", (p) => p.id !== "juju-e-leleco")).sort((a, b) => {
+	const desbloqueadaA = pecaDesbloqueada(a.id);
+	const desbloqueadaB = pecaDesbloqueada(b.id);
+	if (desbloqueadaA !== desbloqueadaB) return desbloqueadaA ? -1 : 1;
 	if (a.id === "power-of-love") return -1;
 	if (b.id === "power-of-love") return 1;
 	const dataA = a.data.data ? new Date(a.data.data).getTime() : 0;
 	const dataB = b.data.data ? new Date(b.data.data).getTime() : 0;
 	return dataB - dataA;
 });
+
+const generos = Array.from(new Set(pecas.map((p) => p.data.genero).filter((g): g is string => Boolean(g)))).sort(
+	(a, b) => a.localeCompare(b, "pt-BR")
+);
 ---
 
 <BaseLayout
@@ -48,10 +56,39 @@ const pecas = (await getCollection("portfolio", (p) => p.id !== "juju-e-leleco")
 			</section>
 		) : (
 			<section class="section">
-				<div class="container portfolio-grid">
-					{pecas.map((peca) => (
-						<PecaCard peca={peca} desbloqueada={pecaDesbloqueada(peca.id)} />
-					))}
+				<div class="container">
+					<div class="portfolio-controles reveal">
+						<label class="portfolio-controles__campo">
+							<span>Ordenar por</span>
+							<select id="portfolio-ordenar">
+								<option value="">Padrão</option>
+								<option value="titulo">Ordem alfabética (A-Z)</option>
+								<option value="genero">Gênero</option>
+								<option value="duracao">Duração da peça</option>
+							</select>
+						</label>
+						{
+							generos.length > 0 && (
+								<label class="portfolio-controles__campo">
+									<span>
+										Gênero
+										<GenerosLegenda />
+									</span>
+									<select id="portfolio-filtro-genero">
+										<option value="">Todos</option>
+										{generos.map((genero) => (
+											<option value={genero}>{genero}</option>
+										))}
+									</select>
+								</label>
+							)
+						}
+					</div>
+					<div class="portfolio-grid">
+						{pecas.map((peca) => (
+							<PecaCard peca={peca} desbloqueada={pecaDesbloqueada(peca.id)} />
+						))}
+					</div>
 				</div>
 			</section>
 		)
@@ -100,8 +137,45 @@ const pecas = (await getCollection("portfolio", (p) => p.id !== "juju-e-leleco")
 
 	.portfolio-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(230px, 270px));
+		justify-content: center;
 		gap: var(--space-md);
+	}
+
+	.portfolio-controles {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--space-md);
+		margin-bottom: var(--space-md);
+	}
+
+	.portfolio-controles__campo {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		font-size: 0.85rem;
+		color: var(--color-pearl-dim);
+	}
+
+	.portfolio-controles__campo > span {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+	}
+
+	.portfolio-controles__campo select {
+		padding: 0.45rem 0.8rem;
+		border: 1px solid rgba(201, 166, 107, 0.35);
+		border-radius: 8px;
+		background: var(--color-obsidian-soft);
+		color: var(--color-pearl);
+		font-size: 0.85rem;
+		cursor: pointer;
+	}
+
+	.portfolio-controles__campo select:focus-visible {
+		outline: 1px solid var(--color-sand);
 	}
 </style>
 
@@ -113,4 +187,57 @@ const pecas = (await getCollection("portfolio", (p) => p.id !== "juju-e-leleco")
 		{ opacity: 0, y: 24 },
 		{ opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out" }
 	);
+
+	const grid = document.querySelector<HTMLElement>(".portfolio-grid");
+	const cards = grid ? (Array.from(grid.children) as HTMLElement[]) : [];
+	const ordemOriginal = [...cards];
+
+	const selectOrdenar = document.getElementById("portfolio-ordenar") as HTMLSelectElement | null;
+	const selectGenero = document.getElementById("portfolio-filtro-genero") as HTMLSelectElement | null;
+
+	function valor(card: HTMLElement, attr: string): string {
+		return card.getAttribute(attr) ?? "";
+	}
+
+	function aplicarOrdenacao(modo: string) {
+		if (!grid) return;
+		let ordenados = [...cards];
+
+		if (modo === "titulo") {
+			ordenados.sort((a, b) => valor(a, "data-titulo").localeCompare(valor(b, "data-titulo"), "pt-BR"));
+		} else if (modo === "genero") {
+			ordenados.sort((a, b) => {
+				const generoA = valor(a, "data-genero");
+				const generoB = valor(b, "data-genero");
+				if (!generoA && generoB) return 1;
+				if (generoA && !generoB) return -1;
+				const cmp = generoA.localeCompare(generoB, "pt-BR");
+				if (cmp !== 0) return cmp;
+				return valor(a, "data-titulo").localeCompare(valor(b, "data-titulo"), "pt-BR");
+			});
+		} else if (modo === "duracao") {
+			ordenados.sort((a, b) => {
+				const duracaoA = valor(a, "data-duracao");
+				const duracaoB = valor(b, "data-duracao");
+				if (duracaoA === "" && duracaoB === "") return 0;
+				if (duracaoA === "") return 1;
+				if (duracaoB === "") return -1;
+				return Number(duracaoA) - Number(duracaoB);
+			});
+		} else {
+			ordenados = [...ordemOriginal];
+		}
+
+		ordenados.forEach((card) => grid.appendChild(card));
+	}
+
+	function aplicarFiltro(genero: string) {
+		cards.forEach((card) => {
+			const generoCard = valor(card, "data-genero");
+			card.style.display = !genero || generoCard === genero ? "" : "none";
+		});
+	}
+
+	selectOrdenar?.addEventListener("change", (e) => aplicarOrdenacao((e.target as HTMLSelectElement).value));
+	selectGenero?.addEventListener("change", (e) => aplicarFiltro((e.target as HTMLSelectElement).value));
 </script>
