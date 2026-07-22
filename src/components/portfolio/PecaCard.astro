@@ -24,14 +24,20 @@ const glow = (peca.data.genero && generos[peca.data.genero]?.corGlow) || "rgba(2
 			class="peca-card"
 			data-titulo={peca.data.titulo}
 			data-genero={peca.data.genero ?? ""}
+			data-classificacao={peca.data.classificacao ?? ""}
 			data-duracao={duracaoSegundos ?? ""}
 			style={`--glow: ${glow}`}
 		>
 			<div class="peca-card__arte" data-letra={inicial} style={capa && `background-image: url(${capa})`} />
 			<div class="peca-card__scrim" />
 			<div class="peca-card__topo">
-				{peca.data.genero && <span class="peca-card__pill">{peca.data.genero}</span>}
-				{duracaoCurta && <span class="peca-card__pill peca-card__pill--duracao">{duracaoCurta}</span>}
+				<div class="peca-card__topo-grupo">
+					{peca.data.genero && <span class="peca-card__pill">{peca.data.genero}</span>}
+					{peca.data.classificacao && (
+						<span class="peca-card__pill peca-card__pill--classificacao">{peca.data.classificacao}</span>
+					)}
+					{duracaoCurta && <span class="peca-card__pill peca-card__pill--duracao">{duracaoCurta}</span>}
+				</div>
 			</div>
 			<div class="peca-card__base">
 				<h3>{peca.data.titulo}</h3>
@@ -45,6 +51,7 @@ const glow = (peca.data.genero && generos[peca.data.genero]?.corGlow) || "rgba(2
 			aria-disabled="true"
 			data-titulo={peca.data.titulo}
 			data-genero={peca.data.genero ?? ""}
+			data-classificacao={peca.data.classificacao ?? ""}
 			data-duracao={duracaoSegundos ?? ""}
 		>
 			<div class="peca-card__arte" data-letra={inicial} style={capa && `background-image: url(${capa})`} />
@@ -131,6 +138,19 @@ const glow = (peca.data.genero && generos[peca.data.genero]?.corGlow) || "rgba(2
 		align-items: flex-start;
 		gap: 0.4rem;
 		z-index: 2;
+	}
+
+	.peca-card__topo-grupo {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.35rem;
+	}
+
+	.peca-card__pill--classificacao {
+		background: rgba(140, 29, 43, 0.55);
+		border-color: rgba(179, 44, 61, 0.6);
+		font-size: 0.5rem;
 	}
 
 	.peca-card__pill {

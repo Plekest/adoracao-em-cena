@@ -4,7 +4,13 @@ import { generos } from "../../lib/generos";
 const entradas = Object.entries(generos);
 ---
 
-<span class="generos-legenda" tabindex="0">
+<button
+	type="button"
+	class="generos-legenda"
+	aria-expanded="false"
+	aria-label="O que significa cada gênero?"
+	aria-describedby="generos-legenda-tooltip"
+>
 	<svg class="generos-legenda__icone" aria-hidden="true" viewBox="0 0 16 16" fill="none">
 		<circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" />
 		<path
@@ -15,7 +21,7 @@ const entradas = Object.entries(generos);
 		/>
 		<circle cx="8" cy="11.3" r="0.15" fill="currentColor" stroke="currentColor" stroke-width="0.9" />
 	</svg>
-	<span class="generos-legenda__tooltip" role="tooltip">
+	<span class="generos-legenda__tooltip" role="tooltip" id="generos-legenda-tooltip">
 		<strong>Gêneros das peças</strong>
 		<dl>
 			{
@@ -28,29 +34,37 @@ const entradas = Object.entries(generos);
 			}
 		</dl>
 	</span>
-</span>
+</button>
 
 <style>
 	.generos-legenda {
 		position: relative;
 		display: inline-flex;
 		align-items: center;
+		background: none;
+		border: 0;
+		padding: 0;
+		margin: 0;
+		font: inherit;
 		color: var(--color-sand);
 		cursor: help;
+		z-index: 1;
 	}
 
 	.generos-legenda__icone {
 		width: 1.1em;
 		height: 1.1em;
+		pointer-events: none;
 	}
 
 	.generos-legenda__tooltip {
 		display: none;
 		position: absolute;
 		top: calc(100% + 0.6rem);
-		left: 0;
+		left: 50%;
+		transform: translateX(-50%);
 		width: max-content;
-		max-width: 320px;
+		max-width: min(320px, calc(100vw - 2.5rem));
 		padding: 0.8rem 1rem;
 		border: 1px solid rgba(201, 166, 107, 0.35);
 		border-radius: 10px;
@@ -59,6 +73,9 @@ const entradas = Object.entries(generos);
 		font-size: 0.8rem;
 		font-weight: 400;
 		line-height: 1.4;
+		text-align: left;
+		text-transform: none;
+		letter-spacing: normal;
 		box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.6);
 		z-index: 10;
 	}
@@ -90,8 +107,33 @@ const entradas = Object.entries(generos);
 	}
 
 	.generos-legenda:hover .generos-legenda__tooltip,
-	.generos-legenda:focus .generos-legenda__tooltip,
-	.generos-legenda:focus-visible .generos-legenda__tooltip {
+	.generos-legenda:focus-visible .generos-legenda__tooltip,
+	.generos-legenda.is-aberta .generos-legenda__tooltip {
 		display: block;
 	}
 </style>
+
+<script>
+	document.querySelectorAll<HTMLButtonElement>(".generos-legenda").forEach((botao) => {
+		botao.addEventListener("click", (evento) => {
+			evento.stopPropagation();
+			const aberta = botao.classList.toggle("is-aberta");
+			botao.setAttribute("aria-expanded", String(aberta));
+		});
+	});
+
+	document.addEventListener("click", () => {
+		document.querySelectorAll(".generos-legenda.is-aberta").forEach((botao) => {
+			botao.classList.remove("is-aberta");
+			botao.setAttribute("aria-expanded", "false");
+		});
+	});
+
+	document.addEventListener("keydown", (evento) => {
+		if (evento.key !== "Escape") return;
+		document.querySelectorAll(".generos-legenda.is-aberta").forEach((botao) => {
+			botao.classList.remove("is-aberta");
+			botao.setAttribute("aria-expanded", "false");
+		});
+	});
+</script>
