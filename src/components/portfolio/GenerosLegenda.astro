@@ -4,13 +4,7 @@ import { generos } from "../../lib/generos";
 const entradas = Object.entries(generos);
 ---
 
-<button
-	type="button"
-	class="generos-legenda"
-	aria-expanded="false"
-	aria-label="O que significa cada gênero?"
-	aria-describedby="generos-legenda-tooltip"
->
+<span class="generos-legenda" tabindex="0" role="button" aria-label="O que significa cada gênero?" aria-describedby="generos-legenda-tooltip">
 	<svg class="generos-legenda__icone" aria-hidden="true" viewBox="0 0 16 16" fill="none">
 		<circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" />
 		<path
@@ -34,18 +28,15 @@ const entradas = Object.entries(generos);
 			}
 		</dl>
 	</span>
-</button>
+</span>
 
 <style>
 	.generos-legenda {
 		position: relative;
 		display: inline-flex;
 		align-items: center;
-		background: none;
-		border: 0;
-		padding: 0;
-		margin: 0;
-		font: inherit;
+		width: 1.1em;
+		height: 1.1em;
 		color: var(--color-sand);
 		cursor: help;
 		z-index: 1;
@@ -60,7 +51,8 @@ const entradas = Object.entries(generos);
 	.generos-legenda__tooltip {
 		display: none;
 		position: absolute;
-		top: calc(100% + 0.6rem);
+		top: calc(100% + 1.5rem);
+		pointer-events: none;
 		left: 50%;
 		transform: translateX(-50%);
 		width: max-content;
@@ -107,33 +99,7 @@ const entradas = Object.entries(generos);
 	}
 
 	.generos-legenda:hover .generos-legenda__tooltip,
-	.generos-legenda:focus-visible .generos-legenda__tooltip,
-	.generos-legenda.is-aberta .generos-legenda__tooltip {
+	.generos-legenda:focus-visible .generos-legenda__tooltip {
 		display: block;
 	}
 </style>
-
-<script>
-	document.querySelectorAll<HTMLButtonElement>(".generos-legenda").forEach((botao) => {
-		botao.addEventListener("click", (evento) => {
-			evento.stopPropagation();
-			const aberta = botao.classList.toggle("is-aberta");
-			botao.setAttribute("aria-expanded", String(aberta));
-		});
-	});
-
-	document.addEventListener("click", () => {
-		document.querySelectorAll(".generos-legenda.is-aberta").forEach((botao) => {
-			botao.classList.remove("is-aberta");
-			botao.setAttribute("aria-expanded", "false");
-		});
-	});
-
-	document.addEventListener("keydown", (evento) => {
-		if (evento.key !== "Escape") return;
-		document.querySelectorAll(".generos-legenda.is-aberta").forEach((botao) => {
-			botao.classList.remove("is-aberta");
-			botao.setAttribute("aria-expanded", "false");
-		});
-	});
-</script>
